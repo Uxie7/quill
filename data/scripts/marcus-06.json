@@ -1,0 +1,129 @@
+{
+  "id": "marcus-06",
+  "client": "marcus",
+  "clientName": "Marcus",
+  "practitioner": "Alex",
+  "date": "2026-10-13",
+  "lines": [
+    {
+      "speaker": "you",
+      "text": "Morning, Marcus. Thanks for the time. Did you get a chance to look at the interim findings?"
+    },
+    {
+      "speaker": "client",
+      "text": "Morning. I did. The delivery delay numbers were bigger than I expected, honestly."
+    },
+    {
+      "speaker": "you",
+      "text": "Yes, the northern route accounts for most of it. I'd like to confirm that with last quarter's data. Could you share it?"
+    },
+    {
+      "speaker": "client",
+      "text": "I'll share last quarter's shipping data by Wednesday. Our analyst needs to clean up a couple of spreadsheets first."
+    },
+    {
+      "speaker": "you",
+      "text": "Perfect. With that I can finish the analysis. I'll send the findings outline on Thursday so you can see the structure before the full report."
+    },
+    {
+      "speaker": "client",
+      "text": "Good. My director will want to see it before the board meeting."
+    },
+    {
+      "speaker": "you",
+      "text": "Understood. Also, invoice two of three goes out on Friday, as per the contract."
+    },
+    {
+      "speaker": "client",
+      "text": "Sounds fine. Send it to accounts as usual."
+    },
+    {
+      "speaker": "you",
+      "text": "Will do."
+    },
+    {
+      "speaker": "client",
+      "text": "Actually, there's something else. The delays are making us think we might need a second phase, maybe covering the warehouse side too."
+    },
+    {
+      "speaker": "you",
+      "text": "Interesting. Is that something you're considering seriously?"
+    },
+    {
+      "speaker": "client",
+      "text": "Maybe. I'll try to talk to my director about a second phase, but no promises. Budgets are tight this quarter."
+    },
+    {
+      "speaker": "you",
+      "text": "That's fair. I can prepare a short scope note if it helps, but only if you want one."
+    },
+    {
+      "speaker": "client",
+      "text": "Let's wait and see how the outline lands."
+    },
+    {
+      "speaker": "you",
+      "text": "Okay. Anything else on your side?"
+    },
+    {
+      "speaker": "client",
+      "text": "No, I think we're in good shape. This has been a smooth engagement so far."
+    },
+    {
+      "speaker": "you",
+      "text": "Glad to hear it. Same time next week?"
+    },
+    {
+      "speaker": "client",
+      "text": "Yes, same time works for me."
+    },
+    {
+      "speaker": "you",
+      "text": "Great. Recap: data from you by Wednesday, outline from me on Thursday, invoice on Friday, and you may raise phase two with your director."
+    },
+    {
+      "speaker": "client",
+      "text": "Yes, thanks."
+    }
+  ],
+  "truth": {
+    "commitments": [
+      {
+        "who": "client",
+        "text": "share last quarter's shipping data",
+        "due": "Wednesday",
+        "firm": true,
+        "quote": "I'll share last quarter's shipping data by Wednesday"
+      },
+      {
+        "who": "you",
+        "text": "send the findings outline",
+        "due": "Thursday",
+        "firm": true,
+        "quote": "I'll send the findings outline on Thursday"
+      },
+      {
+        "who": "you",
+        "text": "send invoice two of three",
+        "due": "Friday",
+        "firm": true,
+        "quote": "invoice two of three goes out on Friday"
+      },
+      {
+        "who": "client",
+        "text": "talk to director about a second phase",
+        "due": null,
+        "firm": false,
+        "quote": "I'll try to talk to my director about a second phase"
+      }
+    ],
+    "avoidedTopic": null,
+    "missedCalls": 0,
+    "expectedLevel": "low"
+  },
+  "stats": {
+    "words": 268,
+    "characters": 1506,
+    "approxMinutes": 1.8
+  }
+}

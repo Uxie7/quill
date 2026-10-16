@@ -1,0 +1,129 @@
+{
+  "id": "ines-08",
+  "client": "ines",
+  "clientName": "Ines",
+  "practitioner": "Alex",
+  "date": "2026-10-15",
+  "lines": [
+    {
+      "speaker": "you",
+      "text": "Hi, Ines. Ready for lesson eight? How did the forehand drills go this week?"
+    },
+    {
+      "speaker": "client",
+      "text": "Better, I think. The forehand feels more natural. The serve is still a mess though. Sorry again about missing the Tuesday lesson."
+    },
+    {
+      "speaker": "you",
+      "text": "No problem. Let's look at the serve. Your toss is drifting behind your head, which pulls the racquet off line. Try placing it a little in front, toward the net post."
+    },
+    {
+      "speaker": "client",
+      "text": "Like this? Oh, that feels weird."
+    },
+    {
+      "speaker": "you",
+      "text": "Weird is normal at first. Try a few more. There, that one was clean."
+    },
+    {
+      "speaker": "client",
+      "text": "Okay, that one felt better."
+    },
+    {
+      "speaker": "you",
+      "text": "For next time, practice the serve toss twice before the next lesson, even without a racquet. Ten tosses each time."
+    },
+    {
+      "speaker": "client",
+      "text": "Okay, I'll practice the serve toss twice before the next lesson."
+    },
+    {
+      "speaker": "you",
+      "text": "And I'll send you a fifteen minute drill video tonight, so you have something to follow."
+    },
+    {
+      "speaker": "client",
+      "text": "That would help, thanks."
+    },
+    {
+      "speaker": "you",
+      "text": "I'll also book the court for Saturday tomorrow, once I check availability. Same time as usual?"
+    },
+    {
+      "speaker": "client",
+      "text": "Saturday works. Actually, I have a problem. Exams start soon and I'm really behind. I might skip next week, I'm not sure yet."
+    },
+    {
+      "speaker": "you",
+      "text": "That's okay. Do you want to keep the Saturday slot anyway?"
+    },
+    {
+      "speaker": "client",
+      "text": "Maybe. I'll know better at the end of the week. I don't want to lose my progress though."
+    },
+    {
+      "speaker": "you",
+      "text": "You won't lose much in one week. The drills will help."
+    },
+    {
+      "speaker": "client",
+      "text": "Right. I'm just stressed."
+    },
+    {
+      "speaker": "you",
+      "text": "Understood. Let's keep it light. Ten minutes of tosses is plenty."
+    },
+    {
+      "speaker": "client",
+      "text": "Okay. Thanks, Coach."
+    },
+    {
+      "speaker": "you",
+      "text": "Recap: tosses twice before the next lesson from you, the video from me tonight, the court booked for Saturday, and you'll tell me about next week."
+    },
+    {
+      "speaker": "client",
+      "text": "Yes, that's it."
+    }
+  ],
+  "truth": {
+    "commitments": [
+      {
+        "who": "client",
+        "text": "practice the serve toss twice before the next lesson",
+        "due": "next lesson",
+        "firm": true,
+        "quote": "I'll practice the serve toss twice before the next lesson"
+      },
+      {
+        "who": "you",
+        "text": "send a fifteen minute drill video",
+        "due": "tonight",
+        "firm": true,
+        "quote": "I'll send you a fifteen minute drill video tonight"
+      },
+      {
+        "who": "you",
+        "text": "book the court for Saturday",
+        "due": "tomorrow",
+        "firm": true,
+        "quote": "I'll also book the court for Saturday tomorrow"
+      },
+      {
+        "who": "client",
+        "text": "skip next week",
+        "due": "next week",
+        "firm": false,
+        "quote": "I might skip next week"
+      }
+    ],
+    "avoidedTopic": null,
+    "missedCalls": 1,
+    "expectedLevel": "mid"
+  },
+  "stats": {
+    "words": 269,
+    "characters": 1495,
+    "approxMinutes": 1.8
+  }
+}

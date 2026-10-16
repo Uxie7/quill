@@ -1,0 +1,112 @@
+{
+  "counts": {
+    "open": 6,
+    "overdue": 3,
+    "reminders": 2,
+    "invoices": 1
+  },
+  "needs": [
+    {
+      "id": "n1",
+      "clientId": "dana",
+      "clientName": "Dana",
+      "who": "client",
+      "text": "Send logo feedback",
+      "due": "Wednesday",
+      "status": "overdue"
+    },
+    {
+      "id": "n2",
+      "clientId": "dana",
+      "clientName": "Dana",
+      "who": "you",
+      "text": "Send revised pricing sheet",
+      "due": "Friday",
+      "status": "overdue"
+    },
+    {
+      "id": "n3",
+      "clientId": "marcus",
+      "clientName": "Marcus",
+      "who": "you",
+      "text": "Send invoice for the discovery phase",
+      "due": "Friday",
+      "status": "overdue"
+    },
+    {
+      "id": "n4",
+      "clientId": "marcus",
+      "clientName": "Marcus",
+      "who": "client",
+      "text": "Introduce you to the warehouse lead",
+      "due": "next week",
+      "status": "open"
+    },
+    {
+      "id": "n5",
+      "clientId": "marcus",
+      "clientName": "Marcus",
+      "who": "you",
+      "text": "Book the site visit",
+      "due": "Thursday",
+      "status": "open"
+    },
+    {
+      "id": "n6",
+      "clientId": "ines",
+      "clientName": "Ines",
+      "who": "client",
+      "text": "Pay for the spring lesson pack",
+      "due": "this week",
+      "status": "open"
+    }
+  ],
+  "reminders": [
+    {
+      "id": "r1",
+      "clientId": "ines",
+      "clientName": "Ines",
+      "text": "Check in on how Ines is feeling about exams",
+      "remindAt": "2026-10-23T09:00:00.000Z",
+      "state": "scheduled"
+    },
+    {
+      "id": "r2",
+      "clientId": "marcus",
+      "clientName": "Marcus",
+      "text": "Review Marcus\u2019s proposal draft",
+      "remindAt": "2026-10-20T14:00:00.000Z",
+      "state": "scheduled"
+    }
+  ],
+  "clients": [
+    {
+      "clientId": "dana",
+      "name": "Dana",
+      "role": "freelancer",
+      "lastCallAt": "2026-09-14T09:00:00.000Z",
+      "openPromises": 2,
+      "status": "attention",
+      "statusLabel": "may be going quiet"
+    },
+    {
+      "clientId": "marcus",
+      "name": "Marcus",
+      "role": "consultant",
+      "lastCallAt": "2026-10-10T09:00:00.000Z",
+      "openPromises": 3,
+      "status": "ok",
+      "statusLabel": "is on track"
+    },
+    {
+      "clientId": "ines",
+      "clientName": "Ines",
+      "name": "Ines",
+      "role": "coach",
+      "lastCallAt": "2026-10-07T09:00:00.000Z",
+      "openPromises": 1,
+      "status": "watch",
+      "statusLabel": "might pause"
+    }
+  ]
+}

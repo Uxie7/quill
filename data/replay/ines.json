@@ -1,0 +1,211 @@
+{
+  "client": {
+    "id": "ines",
+    "name": "Ines",
+    "role": "coach",
+    "gig": "Weekly tennis lessons"
+  },
+  "steps": [
+    {
+      "id": "transcribe",
+      "title": "Listening to the call",
+      "tech": "transcribe_audio, Whisper on this laptop",
+      "result": "45 minutes of audio became 6,100 words.",
+      "ms": 38000
+    },
+    {
+      "id": "extract",
+      "title": "Finding who promised what",
+      "tech": "extract_commitments, open model",
+      "result": "Found 4 promises. 1 of them is unclear.",
+      "ms": 12000
+    },
+    {
+      "id": "history",
+      "title": "Checking your earlier calls",
+      "tech": "search_past_notes, vector search",
+      "result": "Ines struggled with the same serve toss in the last two lessons.",
+      "ms": 400
+    },
+    {
+      "id": "risk",
+      "title": "Checking if Ines is going quiet",
+      "tech": "predict_dropout_risk, TabPFN",
+      "result": "Missed 1 so far. Risk is moderate at 0.36.",
+      "ms": 1800,
+      "egress": {
+        "to": "TabPFN prediction service",
+        "contents": "6 numbers about this client plus 600 anonymized example rows. No name, audio or transcript."
+      }
+    },
+    {
+      "id": "decide",
+      "title": "Deciding what to do",
+      "tech": "decide_next_step, agent reasoning",
+      "result": "A short plan they can do alone keeps them moving without pressure.",
+      "ms": 3000
+    },
+    {
+      "id": "resource",
+      "title": "Finding something useful to attach",
+      "tech": "find_resource, web search",
+      "result": "Chose \"Simple Home Practice Routine for Beginners\".",
+      "ms": 1100,
+      "egress": {
+        "to": "Web search provider",
+        "contents": "Search: \"simple home practice routine for beginners\". Client details removed."
+      }
+    },
+    {
+      "id": "draft",
+      "title": "Writing the drafts",
+      "tech": "draft_followup, open model",
+      "result": "Wrote an email in your usual tone and a reminder.",
+      "ms": 6000
+    }
+  ],
+  "result": {
+    "callId": "replay-ines",
+    "clientId": "ines",
+    "clientName": "Ines",
+    "status": "awaiting_approval",
+    "summary": {
+      "promisesFound": 4,
+      "needsAnswer": 1,
+      "flag": "might pause",
+      "flagLevel": "warn"
+    },
+    "commitments": [
+      {
+        "id": "ines-c0",
+        "clientId": "ines",
+        "callId": "replay-ines",
+        "who": "client",
+        "text": "Practice the serve toss twice before the next lesson",
+        "due": "next lesson",
+        "status": "open",
+        "quote": "I'll practice the serve toss twice before the next lesson",
+        "confidence": 0.9
+      },
+      {
+        "id": "ines-c1",
+        "clientId": "ines",
+        "callId": "replay-ines",
+        "who": "you",
+        "text": "Send a fifteen minute drill video",
+        "due": "tonight",
+        "status": "open",
+        "quote": "I'll send you a fifteen minute drill video tonight",
+        "confidence": 0.9
+      },
+      {
+        "id": "ines-c2",
+        "clientId": "ines",
+        "callId": "replay-ines",
+        "who": "you",
+        "text": "Book the court for Saturday",
+        "due": "tomorrow",
+        "status": "open",
+        "quote": "I'll also book the court for Saturday tomorrow",
+        "confidence": 0.9
+      },
+      {
+        "id": "ines-c3",
+        "clientId": "ines",
+        "callId": "replay-ines",
+        "who": "client",
+        "text": "Skip next week",
+        "due": "next week",
+        "status": "unclear",
+        "quote": "I might skip next week",
+        "confidence": 0.5
+      }
+    ],
+    "question": {
+      "commitmentId": "ines-c3",
+      "title": "Is this a promise?",
+      "text": "Ines said: \"I might skip next week\" Track it as a commitment?",
+      "yesLabel": "Yes, track it"
+    },
+    "why": "Ines mentioned exams and might skip next week, so a short practice plan keeps her progressing without pressure.",
+    "reminderDays": 4,
+    "drafts": [
+      {
+        "id": "replay-ines-email",
+        "callId": "replay-ines",
+        "clientId": "ines",
+        "kind": "email",
+        "subject": "Your serve practice plan",
+        "body": "Hi Ines,\n\nGreat work today. Your serve toss was better in the second half. Before next time, try the toss drill twice at home, and I'll send a 15 minute video tonight.\n\nNo pressure if exams get in the way. I've attached a short routine you can use whenever you have ten minutes.\n\nCoach Alex",
+        "state": "pending"
+      },
+      {
+        "id": "replay-ines-reminder",
+        "callId": "replay-ines",
+        "clientId": "ines",
+        "kind": "reminder",
+        "body": "Ask Ines if she is coming next week.",
+        "state": "pending"
+      }
+    ],
+    "steps": [
+      {
+        "id": "transcribe",
+        "title": "Listening to the call",
+        "tech": "transcribe_audio, Whisper on this laptop",
+        "result": "45 minutes of audio became 6,100 words.",
+        "ms": 38000
+      },
+      {
+        "id": "extract",
+        "title": "Finding who promised what",
+        "tech": "extract_commitments, open model",
+        "result": "Found 4 promises. 1 of them is unclear.",
+        "ms": 12000
+      },
+      {
+        "id": "history",
+        "title": "Checking your earlier calls",
+        "tech": "search_past_notes, vector search",
+        "result": "Ines struggled with the same serve toss in the last two lessons.",
+        "ms": 400
+      },
+      {
+        "id": "risk",
+        "title": "Checking if Ines is going quiet",
+        "tech": "predict_dropout_risk, TabPFN",
+        "result": "Missed 1 so far. Risk is moderate at 0.36.",
+        "ms": 1800,
+        "egress": {
+          "to": "TabPFN prediction service",
+          "contents": "6 numbers about this client plus 600 anonymized example rows. No name, audio or transcript."
+        }
+      },
+      {
+        "id": "decide",
+        "title": "Deciding what to do",
+        "tech": "decide_next_step, agent reasoning",
+        "result": "A short plan they can do alone keeps them moving without pressure.",
+        "ms": 3000
+      },
+      {
+        "id": "resource",
+        "title": "Finding something useful to attach",
+        "tech": "find_resource, web search",
+        "result": "Chose \"Simple Home Practice Routine for Beginners\".",
+        "ms": 1100,
+        "egress": {
+          "to": "Web search provider",
+          "contents": "Search: \"simple home practice routine for beginners\". Client details removed."
+        }
+      },
+      {
+        "id": "draft",
+        "title": "Writing the drafts",
+        "tech": "draft_followup, open model",
+        "result": "Wrote an email in your usual tone and a reminder.",
+        "ms": 6000
+      }
+    ]
+  }
+}

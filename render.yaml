@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: quill-demo
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm run start
+    envVars:
+      - key: MODE
+        value: replay
+      - key: NODE_ENV
+        value: production

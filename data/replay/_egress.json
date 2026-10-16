@@ -1,0 +1,16 @@
+[
+  {
+    "id": "e1",
+    "to": "TabPFN prediction service",
+    "contents": "6 numbers about this client plus 600 anonymized example rows. No name, audio or transcript.",
+    "reason": "Estimate dropout risk",
+    "at": "2026-10-15T10:00:00.000Z"
+  },
+  {
+    "id": "e2",
+    "to": "Web search provider",
+    "contents": "Search: \"client feedback checklist for designers\". Client details removed.",
+    "reason": "Find a public resource to attach",
+    "at": "2026-10-15T10:00:02.000Z"
+  }
+]

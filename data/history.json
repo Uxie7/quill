@@ -1,0 +1,220 @@
+{
+  "calls": [
+    {
+      "id": "dana-03",
+      "client": "dana",
+      "daysAgo": 59,
+      "text": "Hi Dana, here are the first logo concepts. Take your time looking at them. Thanks Alex, I love the coffee cup idea. I'll send you my feedback on the concepts by Wednesday. Great, and I'll send the revised pricing sheet on Friday so we're aligned on the budget. Perfect, talk soon.",
+      "commitments": [
+        {
+          "who": "client",
+          "text": "Send logo feedback",
+          "due": "Wednesday",
+          "dueDaysFromNow": -5,
+          "quote": "I'll send you my feedback on the concepts by Wednesday"
+        },
+        {
+          "who": "you",
+          "text": "Send revised pricing sheet",
+          "due": "Friday",
+          "dueDaysFromNow": -3,
+          "quote": "I'll send the revised pricing sheet on Friday"
+        }
+      ]
+    },
+    {
+      "id": "dana-04",
+      "client": "dana",
+      "daysAgo": 41,
+      "text": "Hi Dana, did you get a chance to look at the concepts? I did, but I'm not sure yet. Can we push the logo decision to next week? I want to show my business partner first. Sure, but it moves the phase one timeline a little. I know, sorry. Let's talk next week then.",
+      "commitments": []
+    },
+    {
+      "id": "dana-05",
+      "client": "dana",
+      "daysAgo": 32,
+      "text": "Hi Dana. Sorry I missed our last call, it was a crazy week. No problem. Have you decided on the logo? Not yet, honestly. Let's talk about it after the weekend, I need more time. Okay, but we are still waiting on the logo decision. I know, I know.",
+      "commitments": []
+    },
+    {
+      "id": "marcus-03",
+      "client": "marcus",
+      "daysAgo": 27,
+      "text": "Morning Marcus. Thanks for the time. I'll send the invoice for the discovery phase on Friday, so it is out of the way. Great, thank you. Also, I'll introduce you to the warehouse lead next week, he knows the loading process best. That would be very useful. And I'll book the site visit for Thursday once we confirm a date. Perfect.",
+      "commitments": [
+        {
+          "who": "you",
+          "text": "Send invoice for the discovery phase",
+          "due": "Friday",
+          "dueDaysFromNow": -4,
+          "quote": "I'll send the invoice for the discovery phase on Friday"
+        },
+        {
+          "who": "client",
+          "text": "Introduce you to the warehouse lead",
+          "due": "next week",
+          "dueDaysFromNow": 5,
+          "quote": "I'll introduce you to the warehouse lead next week"
+        },
+        {
+          "who": "you",
+          "text": "Book the site visit",
+          "due": "Thursday",
+          "dueDaysFromNow": 2,
+          "quote": "I'll book the site visit for Thursday"
+        }
+      ]
+    },
+    {
+      "id": "marcus-04",
+      "client": "marcus",
+      "daysAgo": 13,
+      "text": "Morning. The first results look interesting. Thanks. Do you think a second phase could cover the warehouse side too? Maybe, let's see what the data says first. Sounds good. Same time next week?",
+      "commitments": []
+    },
+    {
+      "id": "marcus-05",
+      "client": "marcus",
+      "daysAgo": 6,
+      "text": "Morning Marcus. Quick check-in. The data request is progressing well. Good to hear. Everything is on track, no blockers on my side. Great, talk next week.",
+      "commitments": []
+    },
+    {
+      "id": "ines-05",
+      "client": "ines",
+      "daysAgo": 25,
+      "text": "Hi Ines. Let's work on the serve toss today. It keeps drifting behind you. I know, it feels strange. Try it a few more times. That's closer. Before I forget, I'll pay for the spring lesson pack this week, I just need to find my card.",
+      "commitments": [
+        {
+          "who": "client",
+          "text": "Pay for the spring lesson pack",
+          "due": "this week",
+          "dueDaysFromNow": 3,
+          "quote": "I'll pay for the spring lesson pack this week"
+        }
+      ]
+    },
+    {
+      "id": "ines-06",
+      "client": "ines",
+      "daysAgo": 18,
+      "text": "Hi Ines, the toss is still the issue. Yes, I keep rushing it. Slow down, breathe, then toss. Better. We'll keep working on it. Sorry I couldn't practice much this week. No problem.",
+      "commitments": []
+    },
+    {
+      "id": "ines-07",
+      "client": "ines",
+      "daysAgo": 9,
+      "text": "Hi Ines, great forehand today. Thanks. The serve toss still wanders, though. I know. Let's keep drilling it next week. Okay, see you then.",
+      "commitments": []
+    }
+  ],
+  "attendance": {
+    "dana": [
+      [
+        66,
+        "attended",
+        10
+      ],
+      [
+        59,
+        "attended",
+        12
+      ],
+      [
+        51,
+        "missed",
+        28
+      ],
+      [
+        41,
+        "attended",
+        18
+      ],
+      [
+        32,
+        "attended",
+        16
+      ],
+      [
+        16,
+        "missed",
+        36
+      ]
+    ],
+    "marcus": [
+      [
+        41,
+        "attended",
+        5
+      ],
+      [
+        34,
+        "attended",
+        5
+      ],
+      [
+        27,
+        "attended",
+        5
+      ],
+      [
+        20,
+        "attended",
+        5
+      ],
+      [
+        13,
+        "attended",
+        5
+      ],
+      [
+        6,
+        "attended",
+        5
+      ]
+    ],
+    "ines": [
+      [
+        60,
+        "attended",
+        8
+      ],
+      [
+        53,
+        "attended",
+        10
+      ],
+      [
+        46,
+        "attended",
+        9
+      ],
+      [
+        39,
+        "missed",
+        15
+      ],
+      [
+        32,
+        "attended",
+        10
+      ],
+      [
+        25,
+        "attended",
+        12
+      ],
+      [
+        18,
+        "attended",
+        9
+      ],
+      [
+        9,
+        "attended",
+        11
+      ]
+    ]
+  }
+}

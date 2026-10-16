@@ -1,0 +1,141 @@
+{
+  "id": "dana-06",
+  "client": "dana",
+  "clientName": "Dana",
+  "practitioner": "Alex",
+  "date": "2026-10-14",
+  "lines": [
+    {
+      "speaker": "you",
+      "text": "Hi Dana, thanks for making it. How's the week going?"
+    },
+    {
+      "speaker": "client",
+      "text": "Hi Alex. Busy, honestly. Sorry about missing the last two calls, things at the shop have been chaotic."
+    },
+    {
+      "speaker": "you",
+      "text": "No worries at all. Let's pick up where we left off. I've got the second round of logo concepts here, and I want to walk you through what changed."
+    },
+    {
+      "speaker": "client",
+      "text": "Great. I did look at the first round again over the weekend."
+    },
+    {
+      "speaker": "you",
+      "text": "Good. The main change is the wordmark. We moved from the rounded type to something a bit sharper, and the coffee cup mark is now just one line."
+    },
+    {
+      "speaker": "client",
+      "text": "I like the single line. It feels more like us. The color is still a bit warm for me though."
+    },
+    {
+      "speaker": "you",
+      "text": "That's an easy fix, I can shift it toward the green we talked about. Do you want to see two versions side by side?"
+    },
+    {
+      "speaker": "client",
+      "text": "Sure, send them over. Honestly, I keep going back and forth on the whole direction."
+    },
+    {
+      "speaker": "you",
+      "text": "That's normal, but I do want to flag that we've pushed the logo decision twice now, and the phase one timeline depends on it."
+    },
+    {
+      "speaker": "client",
+      "text": "I know, I know. Maybe I can approve the logo next week, once I've shown it to my business partner."
+    },
+    {
+      "speaker": "you",
+      "text": "Okay, I'll note that as a maybe. What would make it easier for you?"
+    },
+    {
+      "speaker": "client",
+      "text": "Just the revised draft, with the green version."
+    },
+    {
+      "speaker": "you",
+      "text": "I'll send the revised logo draft on Monday, with both color options."
+    },
+    {
+      "speaker": "client",
+      "text": "Perfect. And I need to send you the brand guidelines, right? The fonts and the packaging notes."
+    },
+    {
+      "speaker": "you",
+      "text": "Yes, that would help a lot. When do you think you can get those to me?"
+    },
+    {
+      "speaker": "client",
+      "text": "I'll get you the brand guidelines by Friday. I just need to pull them from my partner's laptop."
+    },
+    {
+      "speaker": "you",
+      "text": "Great. Friday works. One more thing, I'll send the invoice for phase one this week, so it's out of the way."
+    },
+    {
+      "speaker": "client",
+      "text": "Oh yes, please do. I'll make sure it gets paid."
+    },
+    {
+      "speaker": "you",
+      "text": "Thanks. Should we book the next call? Does Thursday afternoon next week work?"
+    },
+    {
+      "speaker": "client",
+      "text": "Probably, but let me check my calendar and tell you."
+    },
+    {
+      "speaker": "you",
+      "text": "Okay. So to recap: guidelines from you by Friday, logo draft from me on Monday, invoice from me this week, and the logo decision maybe next week."
+    },
+    {
+      "speaker": "client",
+      "text": "That's everything. Thanks, Alex."
+    },
+    {
+      "speaker": "you",
+      "text": "Thanks, Dana. Talk soon."
+    }
+  ],
+  "truth": {
+    "commitments": [
+      {
+        "who": "client",
+        "text": "send brand guidelines",
+        "due": "Friday",
+        "firm": true,
+        "quote": "I'll get you the brand guidelines by Friday"
+      },
+      {
+        "who": "you",
+        "text": "send revised logo draft",
+        "due": "Monday",
+        "firm": true,
+        "quote": "I'll send the revised logo draft on Monday"
+      },
+      {
+        "who": "you",
+        "text": "send the invoice for phase one",
+        "due": "this week",
+        "firm": true,
+        "quote": "I'll send the invoice for phase one this week"
+      },
+      {
+        "who": "client",
+        "text": "approve the logo",
+        "due": "next week",
+        "firm": false,
+        "quote": "Maybe I can approve the logo next week"
+      }
+    ],
+    "avoidedTopic": "logo decision",
+    "missedCalls": 2,
+    "expectedLevel": "high"
+  },
+  "stats": {
+    "words": 374,
+    "characters": 1961,
+    "approxMinutes": 2.5
+  }
+}

@@ -1,0 +1,211 @@
+{
+  "client": {
+    "id": "dana",
+    "name": "Dana",
+    "role": "freelancer",
+    "gig": "Brand identity project"
+  },
+  "steps": [
+    {
+      "id": "transcribe",
+      "title": "Listening to the call",
+      "tech": "transcribe_audio, Whisper on this laptop",
+      "result": "34 minutes of audio became 5,810 words.",
+      "ms": 38000
+    },
+    {
+      "id": "extract",
+      "title": "Finding who promised what",
+      "tech": "extract_commitments, open model",
+      "result": "Found 4 promises. 1 of them is unclear.",
+      "ms": 12000
+    },
+    {
+      "id": "history",
+      "title": "Checking your earlier calls",
+      "tech": "search_past_notes, vector search",
+      "result": "Dana has pushed the logo decision back twice before.",
+      "ms": 400
+    },
+    {
+      "id": "risk",
+      "title": "Checking if Dana is going quiet",
+      "tech": "predict_dropout_risk, TabPFN",
+      "result": "Missed 2 so far. Risk is high at 0.66.",
+      "ms": 1800,
+      "egress": {
+        "to": "TabPFN prediction service",
+        "contents": "6 numbers about this client plus 600 anonymized example rows. No name, audio or transcript."
+      }
+    },
+    {
+      "id": "decide",
+      "title": "Deciding what to do",
+      "tech": "decide_next_step, agent reasoning",
+      "result": "A friendly check-in fits better than a routine recap.",
+      "ms": 3000
+    },
+    {
+      "id": "resource",
+      "title": "Finding something useful to attach",
+      "tech": "find_resource, web search",
+      "result": "Chose \"Client Feedback Checklist for Designers\".",
+      "ms": 1100,
+      "egress": {
+        "to": "Web search provider",
+        "contents": "Search: \"client feedback checklist for designers\". Client details removed."
+      }
+    },
+    {
+      "id": "draft",
+      "title": "Writing the drafts",
+      "tech": "draft_followup, open model",
+      "result": "Wrote an email in your usual tone and a reminder.",
+      "ms": 6000
+    }
+  ],
+  "result": {
+    "callId": "replay-dana",
+    "clientId": "dana",
+    "clientName": "Dana",
+    "status": "awaiting_approval",
+    "summary": {
+      "promisesFound": 4,
+      "needsAnswer": 1,
+      "flag": "may be going quiet",
+      "flagLevel": "warn"
+    },
+    "commitments": [
+      {
+        "id": "dana-c0",
+        "clientId": "dana",
+        "callId": "replay-dana",
+        "who": "client",
+        "text": "Send brand guidelines",
+        "due": "Friday",
+        "status": "open",
+        "quote": "I'll get you the brand guidelines by Friday",
+        "confidence": 0.9
+      },
+      {
+        "id": "dana-c1",
+        "clientId": "dana",
+        "callId": "replay-dana",
+        "who": "you",
+        "text": "Send revised logo draft",
+        "due": "Monday",
+        "status": "open",
+        "quote": "I'll send the revised logo draft on Monday",
+        "confidence": 0.9
+      },
+      {
+        "id": "dana-c2",
+        "clientId": "dana",
+        "callId": "replay-dana",
+        "who": "you",
+        "text": "Send the invoice for phase one",
+        "due": "this week",
+        "status": "open",
+        "quote": "I'll send the invoice for phase one this week",
+        "confidence": 0.9
+      },
+      {
+        "id": "dana-c3",
+        "clientId": "dana",
+        "callId": "replay-dana",
+        "who": "client",
+        "text": "Approve the logo",
+        "due": "next week",
+        "status": "unclear",
+        "quote": "Maybe I can approve the logo next week",
+        "confidence": 0.5
+      }
+    ],
+    "question": {
+      "commitmentId": "dana-c3",
+      "title": "Is this a promise?",
+      "text": "Dana said: \"Maybe I can approve the logo next week\" Track it as a commitment?",
+      "yesLabel": "Yes, track it"
+    },
+    "why": "Dana missed 2 calls and a decision is still open, so a friendly check-in fits better than a plain recap.",
+    "reminderDays": 2,
+    "drafts": [
+      {
+        "id": "replay-dana-email",
+        "callId": "replay-dana",
+        "clientId": "dana",
+        "kind": "email",
+        "subject": "Checking in after our call",
+        "body": "Hi Dana,\n\nThanks for the call today. To recap: you're sending the brand guidelines by Friday, and I'll have the revised logo draft to you on Monday. I'll also send the phase one invoice this week.\n\nI've attached a short checklist that should make the feedback quicker. Does Thursday afternoon work for a quick check-in?\n\nBest,\nAlex",
+        "state": "pending"
+      },
+      {
+        "id": "replay-dana-reminder",
+        "callId": "replay-dana",
+        "clientId": "dana",
+        "kind": "reminder",
+        "body": "Nudge Dana if there is no reply.",
+        "state": "pending"
+      }
+    ],
+    "steps": [
+      {
+        "id": "transcribe",
+        "title": "Listening to the call",
+        "tech": "transcribe_audio, Whisper on this laptop",
+        "result": "34 minutes of audio became 5,810 words.",
+        "ms": 38000
+      },
+      {
+        "id": "extract",
+        "title": "Finding who promised what",
+        "tech": "extract_commitments, open model",
+        "result": "Found 4 promises. 1 of them is unclear.",
+        "ms": 12000
+      },
+      {
+        "id": "history",
+        "title": "Checking your earlier calls",
+        "tech": "search_past_notes, vector search",
+        "result": "Dana has pushed the logo decision back twice before.",
+        "ms": 400
+      },
+      {
+        "id": "risk",
+        "title": "Checking if Dana is going quiet",
+        "tech": "predict_dropout_risk, TabPFN",
+        "result": "Missed 2 so far. Risk is high at 0.66.",
+        "ms": 1800,
+        "egress": {
+          "to": "TabPFN prediction service",
+          "contents": "6 numbers about this client plus 600 anonymized example rows. No name, audio or transcript."
+        }
+      },
+      {
+        "id": "decide",
+        "title": "Deciding what to do",
+        "tech": "decide_next_step, agent reasoning",
+        "result": "A friendly check-in fits better than a routine recap.",
+        "ms": 3000
+      },
+      {
+        "id": "resource",
+        "title": "Finding something useful to attach",
+        "tech": "find_resource, web search",
+        "result": "Chose \"Client Feedback Checklist for Designers\".",
+        "ms": 1100,
+        "egress": {
+          "to": "Web search provider",
+          "contents": "Search: \"client feedback checklist for designers\". Client details removed."
+        }
+      },
+      {
+        "id": "draft",
+        "title": "Writing the drafts",
+        "tech": "draft_followup, open model",
+        "result": "Wrote an email in your usual tone and a reminder.",
+        "ms": 6000
+      }
+    ]
+  }
+}

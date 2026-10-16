@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+pandas
+scikit-learn
+tabpfn-client
+# For fully local use instead: pip install tabpfn  (then set TABPFN_BACKEND=local)

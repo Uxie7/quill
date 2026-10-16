@@ -1,0 +1,211 @@
+{
+  "client": {
+    "id": "marcus",
+    "name": "Marcus",
+    "role": "consultant",
+    "gig": "Operations review, logistics firm"
+  },
+  "steps": [
+    {
+      "id": "transcribe",
+      "title": "Listening to the call",
+      "tech": "transcribe_audio, Whisper on this laptop",
+      "result": "52 minutes of audio became 8,420 words.",
+      "ms": 38000
+    },
+    {
+      "id": "extract",
+      "title": "Finding who promised what",
+      "tech": "extract_commitments, open model",
+      "result": "Found 4 promises. 1 of them is unclear.",
+      "ms": 12000
+    },
+    {
+      "id": "history",
+      "title": "Checking your earlier calls",
+      "tech": "search_past_notes, vector search",
+      "result": "Marcus has asked about a second phase once before.",
+      "ms": 400
+    },
+    {
+      "id": "risk",
+      "title": "Checking if Marcus is going quiet",
+      "tech": "predict_dropout_risk, TabPFN",
+      "result": "No missed calls so far. Risk is low at 0.21.",
+      "ms": 1800,
+      "egress": {
+        "to": "TabPFN prediction service",
+        "contents": "6 numbers about this client plus 600 anonymized example rows. No name, audio or transcript."
+      }
+    },
+    {
+      "id": "decide",
+      "title": "Deciding what to do",
+      "tech": "decide_next_step, agent reasoning",
+      "result": "No sign of drift, so a standard recap is enough.",
+      "ms": 3000
+    },
+    {
+      "id": "resource",
+      "title": "Finding something useful to attach",
+      "tech": "find_resource, web search",
+      "result": "Chose \"Consulting Findings Report Outline Template\".",
+      "ms": 1100,
+      "egress": {
+        "to": "Web search provider",
+        "contents": "Search: \"consulting findings report outline template\". Client details removed."
+      }
+    },
+    {
+      "id": "draft",
+      "title": "Writing the drafts",
+      "tech": "draft_followup, open model",
+      "result": "Wrote an email in your usual tone and a reminder.",
+      "ms": 6000
+    }
+  ],
+  "result": {
+    "callId": "replay-marcus",
+    "clientId": "marcus",
+    "clientName": "Marcus",
+    "status": "awaiting_approval",
+    "summary": {
+      "promisesFound": 4,
+      "needsAnswer": 1,
+      "flag": "is on track",
+      "flagLevel": "ok"
+    },
+    "commitments": [
+      {
+        "id": "marcus-c0",
+        "clientId": "marcus",
+        "callId": "replay-marcus",
+        "who": "client",
+        "text": "Share last quarter's shipping data",
+        "due": "Wednesday",
+        "status": "open",
+        "quote": "I'll share last quarter's shipping data by Wednesday",
+        "confidence": 0.9
+      },
+      {
+        "id": "marcus-c1",
+        "clientId": "marcus",
+        "callId": "replay-marcus",
+        "who": "you",
+        "text": "Send the findings outline",
+        "due": "Thursday",
+        "status": "open",
+        "quote": "I'll send the findings outline on Thursday",
+        "confidence": 0.9
+      },
+      {
+        "id": "marcus-c2",
+        "clientId": "marcus",
+        "callId": "replay-marcus",
+        "who": "you",
+        "text": "Send invoice two of three",
+        "due": "Friday",
+        "status": "open",
+        "quote": "invoice two of three goes out on Friday",
+        "confidence": 0.9
+      },
+      {
+        "id": "marcus-c3",
+        "clientId": "marcus",
+        "callId": "replay-marcus",
+        "who": "client",
+        "text": "Talk to director about a second phase",
+        "due": null,
+        "status": "unclear",
+        "quote": "I'll try to talk to my director about a second phase",
+        "confidence": 0.5
+      }
+    ],
+    "question": {
+      "commitmentId": "marcus-c3",
+      "title": "Is this a promise?",
+      "text": "Marcus said: \"I'll try to talk to my director about a second phase\" Track it as a commitment?",
+      "yesLabel": "Yes, track it"
+    },
+    "why": "Marcus attends every call and replies quickly, so a standard recap is enough. The open question is a possible second phase, which only you can decide.",
+    "reminderDays": 7,
+    "drafts": [
+      {
+        "id": "replay-marcus-email",
+        "callId": "replay-marcus",
+        "clientId": "marcus",
+        "kind": "email",
+        "subject": "Recap of our call",
+        "body": "Hi Marcus,\n\nThanks for the time today. A quick recap: you're sending last quarter's shipping data by Wednesday, I'll share the findings outline on Thursday, and invoice two of three goes out Friday.\n\nI've attached a simple outline template so you can see the shape of the findings early.\n\nBest,\nAlex",
+        "state": "pending"
+      },
+      {
+        "id": "replay-marcus-reminder",
+        "callId": "replay-marcus",
+        "clientId": "marcus",
+        "kind": "reminder",
+        "body": "Check that Marcus's shipping data has arrived.",
+        "state": "pending"
+      }
+    ],
+    "steps": [
+      {
+        "id": "transcribe",
+        "title": "Listening to the call",
+        "tech": "transcribe_audio, Whisper on this laptop",
+        "result": "52 minutes of audio became 8,420 words.",
+        "ms": 38000
+      },
+      {
+        "id": "extract",
+        "title": "Finding who promised what",
+        "tech": "extract_commitments, open model",
+        "result": "Found 4 promises. 1 of them is unclear.",
+        "ms": 12000
+      },
+      {
+        "id": "history",
+        "title": "Checking your earlier calls",
+        "tech": "search_past_notes, vector search",
+        "result": "Marcus has asked about a second phase once before.",
+        "ms": 400
+      },
+      {
+        "id": "risk",
+        "title": "Checking if Marcus is going quiet",
+        "tech": "predict_dropout_risk, TabPFN",
+        "result": "No missed calls so far. Risk is low at 0.21.",
+        "ms": 1800,
+        "egress": {
+          "to": "TabPFN prediction service",
+          "contents": "6 numbers about this client plus 600 anonymized example rows. No name, audio or transcript."
+        }
+      },
+      {
+        "id": "decide",
+        "title": "Deciding what to do",
+        "tech": "decide_next_step, agent reasoning",
+        "result": "No sign of drift, so a standard recap is enough.",
+        "ms": 3000
+      },
+      {
+        "id": "resource",
+        "title": "Finding something useful to attach",
+        "tech": "find_resource, web search",
+        "result": "Chose \"Consulting Findings Report Outline Template\".",
+        "ms": 1100,
+        "egress": {
+          "to": "Web search provider",
+          "contents": "Search: \"consulting findings report outline template\". Client details removed."
+        }
+      },
+      {
+        "id": "draft",
+        "title": "Writing the drafts",
+        "tech": "draft_followup, open model",
+        "result": "Wrote an email in your usual tone and a reminder.",
+        "ms": 6000
+      }
+    ]
+  }
+}

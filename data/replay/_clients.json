@@ -1,0 +1,20 @@
+[
+  {
+    "id": "dana",
+    "name": "Dana",
+    "role": "freelancer",
+    "gig": "Brand identity project"
+  },
+  {
+    "id": "marcus",
+    "name": "Marcus",
+    "role": "consultant",
+    "gig": "Operations review, logistics firm"
+  },
+  {
+    "id": "ines",
+    "name": "Ines",
+    "role": "coach",
+    "gig": "Weekly tennis lessons"
+  }
+]
