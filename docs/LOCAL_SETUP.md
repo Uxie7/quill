@@ -32,7 +32,7 @@ To run live transcription, promise extraction, dropout-risk calculation, and dra
 
 ## 3. MongoDB Setup (Choose Option A or Option B)
 
-### Option A: MongoDB Atlas (Cloud Free Tier — Recommended, No Installation Required)
+### Option A: MongoDB Atlas (Cloud Free Tier: Recommended, No Installation Required)
 
 1. Go to [mongodb.com/cloud/atlas/register](https://www.mongodb.com/cloud/atlas/register) and create a free account.
 2. Create a free **M0 cluster** (select your nearest region).
