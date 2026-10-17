@@ -36,16 +36,23 @@ npm install
 MODE=replay npm run start        # http://localhost:3000
 ```
 
-## Live mode
+## Live mode (local or cloud database + local models)
 
-1. Install: Node 20, MongoDB (Docker: `docker run -d --name quill-mongo -p 27017:27017 mongodb/mongodb-atlas-local`),
-   Ollama (`ollama pull qwen3:8b` and `ollama pull nomic-embed-text`). For audio: ffmpeg and a whisper.cpp build.
-2. `cp .env.example .env` and edit it.
-3. `npm install && npm run seed`
-4. `npm run dev` and open http://localhost:3000
+> 📖 **Full step-by-step setup walkthrough**: See [docs/LOCAL_SETUP.md](docs/LOCAL_SETUP.md) for detailed instructions on setting up MongoDB Atlas (free tier) and Ollama on Windows, Mac, or Linux.
 
-The "Use the sample call" button works without audio: it feeds the scripted transcript through the same pipeline.
-Uploading a real audio file needs whisper.cpp (`WHISPER_BIN`, `WHISPER_MODEL`).
+1. **Database** (Pick one):
+   - **MongoDB Atlas** (Free cloud tier, zero installation): Create an M0 cluster at [mongodb.com/cloud/atlas](https://www.mongodb.com/cloud/atlas) and set `MONGODB_URI` in `.env`.
+   - **Local MongoDB**: Docker (`docker run -d --name quill-mongo -p 27017:27017 mongo:latest`) or Windows MSI installer.
+2. **Local AI Model (Ollama)**:
+   - Install from [ollama.com](https://ollama.com).
+   - Pull the required models: `ollama pull qwen3:8b` (or `qwen2.5:7b`) and `ollama pull nomic-embed-text`.
+3. **Environment setup**:
+   - `cp .env.example .env` and update `MONGODB_URI` / `LLM_MODEL`.
+4. **Seed database & run**:
+   - `npm install && npm run seed`
+   - `npm run dev` and open http://localhost:3000
+
+The "Use the sample call" button works without audio: it feeds the scripted transcript through the same pipeline. Uploading a real audio file needs whisper.cpp (`WHISPER_BIN`, `WHISPER_MODEL`).
 
 ### Optional pieces
 
