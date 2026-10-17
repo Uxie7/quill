@@ -1,0 +1,38 @@
+[
+  {
+    "script": "dana-06",
+    "recall": 1,
+    "precision": 1,
+    "speaker": 1,
+    "ambiguity": 1,
+    "extra": 0,
+    "seconds": 6,
+    "flag": "might pause",
+    "expected": "high",
+    "level": "warn"
+  },
+  {
+    "script": "ines-08",
+    "recall": 1,
+    "precision": 1,
+    "speaker": 1,
+    "ambiguity": 1,
+    "extra": 0,
+    "seconds": 5,
+    "flag": "might pause",
+    "expected": "mid",
+    "level": "warn"
+  },
+  {
+    "script": "marcus-06",
+    "recall": 1,
+    "precision": 1,
+    "speaker": 1,
+    "ambiguity": 1,
+    "extra": 0,
+    "seconds": 5,
+    "flag": "is on track",
+    "expected": "low",
+    "level": "low"
+  }
+]
