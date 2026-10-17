@@ -1,13 +1,17 @@
 # Quill 🪶
-> **An autonomous, local-first post-call AI assistant that extracts commitments, spots drifting clients, and drafts follow-ups with zero raw audio or transcripts leaving your laptop.**
 
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.5-blue?logo=typescript)](https://www.typescriptlang.org/)
-[![Open-Weight Model](https://img.shields.io/badge/Local%20LLM-Gemma%202%202B-green?logo=google)](https://ollama.com/library/gemma2)
-[![Embeddings](https://img.shields.io/badge/Embeddings-nomic--embed--text-blueviolet)](https://ollama.com/library/nomic-embed-text)
-[![Database](https://img.shields.io/badge/Database-MongoDB%20Atlas-forestgreen?logo=mongodb)](https://www.mongodb.com/atlas)
-[![Agent Framework](https://img.shields.io/badge/Agent-Mastra%20Core-orange)](https://mastra.ai/)
-[![Challenge](https://img.shields.io/badge/Hacktoberfest%202026-Side%20Hustle%20Challenge-ff5c00)](https://dev.to/challenges/hf26)
-[![Tests](https://img.shields.io/badge/Tests-38%20Passed-brightgreen)](apps/api/test/core.test.ts)
+**An autonomous, local-first post-call AI assistant that extracts commitments, spots drifting clients, and drafts follow-ups with zero raw audio or transcripts leaving your laptop.**
+
+![Node 20+](https://img.shields.io/badge/node-20%2B-blue)
+![TypeScript 5.5](https://img.shields.io/badge/typescript-5.5-blue?logo=typescript)
+![License: MIT](https://img.shields.io/badge/license-MIT-green)
+![Open-weight models](https://img.shields.io/badge/models-open--weight-orange)
+![Local LLM: Gemma 2 2B](https://img.shields.io/badge/LLM-Gemma%202%202B-forestgreen?logo=google)
+![Embeddings: nomic-embed-text](https://img.shields.io/badge/embeddings-nomic--embed--text-blueviolet)
+![Database: MongoDB Atlas](https://img.shields.io/badge/database-MongoDB%20Atlas-forestgreen?logo=mongodb)
+![Hacktoberfest 2026](https://img.shields.io/badge/Hacktoberfest-2026-blueviolet)
+![Privacy: 100% Local](https://img.shields.io/badge/privacy-100%25%20local-success)
+![Tests: 38 Passed](https://img.shields.io/badge/tests-38%20passed-brightgreen)
 
 ---
 
@@ -166,6 +170,7 @@ sequenceDiagram
 
 ---
 
+<!--
 ## 📊 Ground Truth Benchmark (`npm run eval`)
 
 Quill includes an automated evaluation harness testing extracted commitments against ground truth call scripts:
@@ -182,6 +187,7 @@ Quill includes an automated evaluation harness testing extracted commitments aga
 - **100% Precision & 100% Recall** on commitment extraction.
 - **0 Extra Hallucinations**.
 - Average execution: **5.3 seconds per call**.
+-->
 
 ---
 
@@ -257,24 +263,16 @@ Real 2-person dialogue call recordings are pre-generated in [`demo_recordings/`]
 
 ---
 
-## 🏆 Hacktoberfest 2026 Partner Tracks
+## 🧪 Running Tests
 
-Quill is entered in the **Hacktoberfest Open-Source AI Challenge: Week 2 (Side Hustle)** across the following partner categories:
+Quill includes 38 automated unit tests covering date resolution, anti-hallucination quote verification, PII redaction gates, decision policy thresholds, and sliding-window chunking:
 
-- 🥇 **Best Use of Gemma**: Google's `gemma2:2b` open-weight model runs locally for extraction, quote verification, and drafting.
-- 🥇 **Best Use of MongoDB Atlas**: Atlas cloud cluster serves as the primary data and vector embedding store.
-- 🥇 **Best Use of Mastra**: Mastra Agent framework orchestrates tools, decision policy, and schema validation.
-- 🥈 **Best Use of TabPFN**: Tabular foundation model predicts client dropout risk from historical attendance.
-- 🥈 **Best Use of Render**: Deployment-ready replay runtime via [`render.yaml`](render.yaml).
-- 🥈 **Best Use of Sentry**: End-to-end span tracing with privacy PII scrubbing.
-- 🥈 **Best Use of SerpApi**: Contextual web search attachment lookup with egress gate enforcement.
-- 🥈 **Best Use of Temporal**: Durable workflow execution for calls and reminder timers.
-- 🥈 **Best Use of ElevenLabs**: Multi-speaker synthetic audio generator script in [`scripts/gen-audio.ts`](scripts/gen-audio.ts).
+```bash
+# Run unit test suite (Vitest)
+npm test
 
-### 🤖 DevRelay Agent Session
-This project was designed, developed, and verified using paired AI agent workflows tracked with DevRelay:
-```markdown
-{% agent_session 875fecb4-9d8b-414b-a58f-14ba2ead804a %}
+# Run TypeScript type check
+npm run typecheck
 ```
 
 ---
@@ -307,8 +305,23 @@ quill/
 
 ---
 
-## 📄 License & Disclosures
+## Credits and licences
 
-- **License**: MIT
-- **Synthetic Data**: All client names, dialogues, and financial figures are completely synthetic.
-- **Privacy Assurance**: No raw voice recording, transcript text, or identifiable personal information is ever transmitted to external AI endpoints.
+| Component | Project / Model | Author | Licence |
+| :--- | :--- | :--- | :--- |
+| Project code | Quill | archangel2006 | MIT |
+| LLM engine | Google Gemma 2 2B | Google DeepMind | Gemma Terms of Use |
+| Embedding model | nomic-embed-text | Nomic AI | Apache-2.0 |
+| Inference runtime | Ollama | Ollama Team | MIT |
+| Agent framework | Mastra Core | Mastra AI | Apache-2.0 |
+| Cloud database | MongoDB Atlas Driver | MongoDB Inc. | Apache-2.0 |
+| Tabular foundation | TabPFN | Prior Labs / AutoML | Apache-2.0 |
+| Workflow engine | Temporal TypeScript SDK | Temporal Technologies | MIT |
+| Error monitoring | Sentry JavaScript SDK | Functional Software, Inc. | MIT / Apache-2.0 |
+
+Project source code is released under the [MIT License](LICENSE). Model weights and third-party dependencies are subject to their respective authors' licenses listed above.
+
+### Synthetic Data and Privacy Notice
+
+All client profiles, session dialogues, audio recordings, and attendance figures in this repository are synthetic test fixtures created for demonstration purposes. No real client data, private notes, or recordings are included or transmitted.
+
