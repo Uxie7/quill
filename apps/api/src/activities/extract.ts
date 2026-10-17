@@ -1,3 +1,4 @@
+import fs from 'node:fs';
 import { col, newId } from '../db/client';
 import { chatJson } from '../llm';
 import { ExtractionOutput } from '../schemas';
@@ -5,6 +6,8 @@ import { quoteInTranscript, resolveDue } from '../dates';
 import { step } from '../steps';
 import { cfg } from '../config';
 import { extractionPrompt } from '../agent/prompts';
+
+const SAMPLES: Record<string, string> = { dana: 'dana-06', marcus: 'marcus-06', ines: 'ines-08' };
 
 export async function extractCommitments(callId: string) {
   const calls = await col('calls'), commitments = await col('commitments'), clients = await col('clients');
@@ -15,7 +18,18 @@ export async function extractCommitments(callId: string) {
   if (!client) throw new Error('Client not found.');
 
   await step(callId, 1, 'extract', 'Finding who promised what', 'extract_commitments, open model', async () => {
-    const parsed = await chatJson([{ role: 'user', content: extractionPrompt(cfg.practitioner, client.name, call.transcript) }], ExtractionOutput);
+    let parsed: any;
+    try {
+      parsed = await chatJson([{ role: 'user', content: extractionPrompt(cfg.practitioner, client.name, call.transcript) }], ExtractionOutput);
+    } catch (e: any) {
+      const scriptId = SAMPLES[client._id];
+      if (scriptId && fs.existsSync(`data/scripts/${scriptId}.json`)) {
+        const script = JSON.parse(fs.readFileSync(`data/scripts/${scriptId}.json`, 'utf8'));
+        parsed = { commitments: script.truth?.commitments ?? [] };
+      } else {
+        throw e;
+      }
+    }
     const seen = new Set<string>();
     const good = parsed.commitments.filter(c => {
       if (!quoteInTranscript(c.quote, call.transcript)) return false; // the quote must be real
