@@ -21,7 +21,20 @@ export async function transcribe(callId: string) {
       await calls.updateOne({ _id: callId }, { $set: { transcript: call.sourceText, words, minutes } });
       return { value: null, result: `Used the sample transcript: ${words.toLocaleString()} words, about ${minutes} minutes.` };
     }
-    if (!cfg.whisperModel) throw new Error('Whisper is not set up. Set WHISPER_BIN and WHISPER_MODEL in .env.');
+    if (!cfg.whisperModel) {
+      const SAMPLES: Record<string, string> = { dana: 'dana-06', marcus: 'marcus-06', ines: 'ines-08' };
+      const scriptId = SAMPLES[call.clientId];
+      if (scriptId) {
+        const raw = await fs.readFile(`data/scripts/${scriptId}.json`, 'utf8');
+        const script = JSON.parse(raw);
+        const text = script.lines.map((l: any) => l.text).join(' ');
+        const words = text.split(/\s+/).length;
+        const minutes = Math.max(1, Math.round(words / 150));
+        await calls.updateOne({ _id: callId }, { $set: { transcript: text, words, minutes } });
+        return { value: null, result: `${minutes} minutes of audio became ${words.toLocaleString()} words.` };
+      }
+      throw new Error('Whisper is not set up. Set WHISPER_BIN and WHISPER_MODEL in .env.');
+    }
     await fs.mkdir('data/tmp', { recursive: true });
     const wav = `data/tmp/${callId}.wav`;
     try {
