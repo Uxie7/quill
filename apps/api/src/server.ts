@@ -7,6 +7,7 @@ initSentry();
 const app = express();
 app.use(express.json({ limit: '5mb' }));
 app.use(express.static(path.resolve('apps/web/public')));
+app.use('/demo_recordings', express.static(path.resolve('demo_recordings')));
 
 if (cfg.mode === 'replay') {
   (await import('./replay/routes')).replayRoutes(app);
