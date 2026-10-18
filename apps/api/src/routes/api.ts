@@ -44,6 +44,19 @@ export function liveRoutes(app: Express) {
     await (await col('clients')).insertOne(doc);
     res.status(201).json(clientView(doc));
   }));
+  app.delete('/api/clients/:id', ah(async (req, res) => {
+    const id = String(req.params.id);
+    if (['dana', 'marcus', 'ines'].includes(id)) {
+      return fail(res, 403, 'forbidden', 'Initial demo clients cannot be deleted.');
+    }
+    const clients = await col('clients');
+    const result = await clients.deleteOne({ _id: id });
+    if (result.deletedCount === 0) return fail(res, 404, 'not_found', 'No such client.');
+    await (await col('calls')).deleteMany({ clientId: id });
+    await (await col('commitments')).deleteMany({ clientId: id });
+    await (await col('reminders')).deleteMany({ clientId: id });
+    res.json({ ok: true, deletedId: id });
+  }));
 
   // Calls
   app.post('/api/calls', upload.single('audio'), ah(async (req, res) => {
