@@ -1,461 +1,1636 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Quill: what to do after every client call</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-:root{color-scheme:light;--bg:#fff;--pn:#F4F5F7;--ink:#111418;--mu:#5B6470;--ln:#E3E6EA;--ac:#23408E;--as:#E8EDF8;--ok:#1A7F5A;--os:#E5F3EC;--am:#9A5B00;--ams:#FBF0DC;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-*,*:before,*:after{box-sizing:inherit}html{scroll-padding-top:env(safe-area-inset-top,0px)}
-body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 Geist,system-ui,sans-serif}
-h1,h2,h3{font-family:"Instrument Serif",Georgia,serif;font-weight:400;margin:0;letter-spacing:-.015em}
-h1{font-size:clamp(44px,7vw,86px);line-height:1}h2{font-size:clamp(28px,3.6vw,40px);line-height:1.1}h3{font-size:22px}
-header{display:flex;align-items:center;gap:26px;padding:18px clamp(18px,5vw,64px)}
-.brand{font-family:"Instrument Serif",serif;font-size:28px;text-decoration:none;color:var(--ink)}
-nav{display:flex;gap:22px;flex:1}nav a{text-decoration:none;color:var(--mu);font-weight:500}nav a.on{color:var(--ink)}
-.btn{font:inherit;font-weight:600;background:var(--ink);color:#fff;border:0;border-radius:999px;padding:12px 22px;cursor:pointer;text-decoration:none;display:inline-block}
-.btn.ln{background:transparent;color:var(--ink);border:1px solid var(--ln)}.btn.sm{padding:8px 15px;font-size:14px}.btn.ac{background:var(--ac)}.btn:disabled{opacity:.4;cursor:default}
-:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
-[data-page]{display:none}[data-page].on{display:block}
-.wrap{max-width:1160px;margin:0 auto;padding:0 clamp(18px,5vw,64px)}
-.hero{display:grid;grid-template-columns:1.1fr .9fr;gap:56px;align-items:center;padding:50px 0 84px}
-.l{font-size:20px;color:var(--mu);max-width:46ch;margin:24px 0 30px;line-height:1.5}
-.card{border:1px solid var(--ln);border-radius:16px;background:#fff}
-.mock{padding:24px;box-shadow:0 18px 50px -26px rgba(17,20,24,.3)}.mock h4{margin:0 0 4px;font-weight:600}.mock .s{color:var(--mu);font-size:14px;margin-bottom:14px}
-.pr{display:flex;gap:10px;padding:10px 0;border-top:1px solid var(--ln)}.pr b{min-width:46px;font-weight:600}.pr span{color:var(--mu)}
-.sec{padding:80px 0;border-top:1px solid var(--ln)}
-.flow{display:grid;grid-template-columns:repeat(3,1fr);gap:40px;margin-top:34px}.flow h3{margin:8px 0}.flow p{color:var(--mu);margin:0}.flow span{color:var(--ac);font-weight:600}
-.dl{display:grid;grid-template-columns:230px 1fr;margin-top:30px}.dl dt,.dl dd{margin:0;padding:18px 0;border-top:1px solid var(--ln)}.dl dt{font-weight:600}.dl dd{color:var(--mu);max-width:62ch}
-table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:12px 12px 12px 0;border-top:1px solid var(--ln);vertical-align:top}th{font-weight:500;color:var(--mu);font-size:14px;border-top:0}
-.pill{display:inline-block;font-size:13px;font-weight:500;padding:3px 11px;border-radius:99px;white-space:nowrap}.pill.g{background:var(--os);color:var(--ok)}.pill.a{background:var(--ams);color:var(--am)}.pill.b{background:var(--as);color:var(--ac)}
-footer{padding:36px 0 56px;color:var(--mu);border-top:1px solid var(--ln);font-size:14px}
-.ob{max-width:640px;margin:0 auto;padding:40px clamp(18px,5vw,40px) 80px}.ob .p{color:var(--mu);font-weight:500;margin-bottom:14px}
-.bar{height:4px;background:var(--ln);border-radius:2px;margin-bottom:34px}.bar i{display:block;height:100%;background:var(--ac);border-radius:2px;transition:width .3s}
-.opt{display:block;width:100%;text-align:left;font:inherit;background:#fff;border:1px solid var(--ln);border-radius:14px;padding:16px 18px;margin-top:12px;cursor:pointer;color:var(--ink)}.opt small{display:block;color:var(--mu)}.opt.on{border-color:var(--ac);box-shadow:0 0 0 1px var(--ac);background:var(--as)}
-.ob .sub{color:var(--mu);margin:10px 0 8px;font-size:17px}.nv{display:flex;justify-content:space-between;margin-top:34px}
-.app{display:grid;grid-template-columns:240px minmax(0,1fr) 470px;min-height:calc(100vh - 72px);border-top:1px solid var(--ln);transition:grid-template-columns .2s ease}
-.app.collapsed{grid-template-columns:0 minmax(0,1fr) 470px}
-.app.collapsed .side{display:none}
-.app.collapsed #sb-expand{display:inline-flex}
-#sb-expand{display:none}
-.side-head{display:flex;align-items:center;gap:8px;margin-bottom:12px}
-.icon-btn{font:inherit;background:none;border:1px solid transparent;border-radius:8px;padding:6px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;color:var(--ink);transition:all .15s}
-.icon-btn:hover{background:#fff;border-color:var(--ln)}
-.col{padding:24px}.col+.col{border-left:1px solid var(--ln)}.side{background:var(--pn)}
-.lab{font-size:13px;color:var(--mu);font-weight:500;margin:0 0 8px}
-.cl-row{position:relative;display:flex;align-items:center;margin-bottom:4px}
-.cl-row .cl{flex:1;margin-bottom:0}
-.del-cl-btn{background:none;border:0;padding:6px;cursor:pointer;color:var(--mu);opacity:.6;border-radius:6px;transition:all .15s;display:inline-flex;align-items:center;justify-content:center;position:absolute;right:8px}
-.del-cl-btn:hover{color:#D9383A;background:#FDE8E8;opacity:1}
-.cl{display:block;width:100%;text-align:left;font:inherit;background:none;border:0;border-radius:10px;padding:10px 12px;cursor:pointer;color:var(--ink);margin-bottom:4px}.cl small{display:block;color:var(--mu);line-height:1.35}.cl.on{background:#fff;box-shadow:0 0 0 1px var(--ln)}
-.player-box{background:var(--pn);border:1px solid var(--ln);border-radius:14px;padding:12px 16px;margin:14px 0 16px}
-.player-row{display:flex;align-items:center;gap:12px}
-.ply-btn{width:36px;height:36px;border-radius:50%;background:var(--ink);color:#fff;border:0;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:background .15s}
-.ply-btn:hover{background:var(--ac)}
-.player-track{flex:1;display:flex;flex-direction:column;gap:5px;min-width:0}
-.player-info{display:flex;justify-content:space-between;align-items:center;font-size:13px}
-.player-seek{width:100%;accent-color:var(--ac);cursor:pointer;height:4px;margin:0}
-.speed-selector{display:flex;gap:4px;align-items:center;flex-shrink:0}
-.spd-btn{font:inherit;font-size:12px;font-weight:600;padding:4px 8px;border-radius:6px;border:1px solid var(--ln);background:#fff;color:var(--mu);cursor:pointer;transition:all .15s}
-.spd-btn.on{background:var(--ink);color:#fff;border-color:var(--ink)}
-.modal{position:fixed;inset:0;background:rgba(17,20,24,.4);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;z-index:99;opacity:0;pointer-events:none;transition:opacity .2s}
-.modal.on{opacity:1;pointer-events:auto}
-.modal-card{background:#fff;border:1px solid var(--ln);border-radius:18px;padding:26px;width:92%;max-width:440px;box-shadow:0 24px 60px -20px rgba(0,0,0,.25)}
-.modal-card h3{margin:0 0 4px}
-.modal-field{margin:14px 0 0}
-.modal-field label{display:block;font-size:13px;font-weight:500;color:var(--mu);margin-bottom:6px}
-.modal-field input,.modal-field select{width:100%;font:inherit;padding:10px 12px;border:1px solid var(--ln);border-radius:10px;color:var(--ink);background:#fff}
-.modal-field select{cursor:pointer}
-.drop{display:block;border:1.5px dashed #C3C9D6;border-radius:14px;padding:26px;text-align:center;color:var(--mu);cursor:pointer;margin:16px 0 12px}.drop b{color:var(--ink);display:block;margin-bottom:2px}
-.drop.has{border-style:solid;border-color:var(--ok);background:var(--os);color:var(--ok)}.drop.has b{color:var(--ok)}
-.acts{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.st{display:grid;grid-template-columns:22px 1fr auto;gap:12px;padding:13px 0;border-bottom:1px solid var(--ln);opacity:0;transform:translateY(5px);transition:all .35s}.st.on{opacity:1;transform:none}
-.st b{font-weight:600}.st p{margin:3px 0 0;color:var(--mu)}.st .t{display:none;color:var(--ac);font-size:13px;margin-top:3px}.tech .st .t{display:block}.st .ms{color:var(--mu);font-size:13px}
-.dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--ac);margin-top:5px}.dot.sp{border-top-color:transparent;animation:sp .8s linear infinite}.dot.ok{background:var(--ac)}.dot.am{background:var(--am);border-color:var(--am)}
-@keyframes sp{to{transform:rotate(360deg)}}
-.tg{display:flex;align-items:center;gap:8px;color:var(--mu);font-size:14px;margin:12px 0 4px}
-.sum{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:4px 0 8px}.sum div{border:1px solid var(--ln);border-radius:14px;padding:14px}.sum b{display:block;font-family:"Instrument Serif",serif;font-size:28px;font-weight:400;line-height:1.1}.sum span{color:var(--mu);font-size:14px}.sum .w{background:var(--ams);border-color:transparent}.sum .g{background:var(--os);border-color:transparent}
-.res{display:none}.res.on{display:block}.res h3{margin:26px 0 8px}
-.q{border:1px solid var(--ln);border-radius:14px;padding:16px;margin-top:12px}.q textarea{width:100%;font:inherit;font-size:14px;border:1px solid var(--ln);border-radius:10px;padding:10px;margin:8px 0;min-height:170px;resize:vertical;color:var(--ink)}
-.q.done{background:var(--pn);border-color:transparent;color:var(--ok);font-weight:500}
-.loc{padding:12px 14px;border-radius:12px;background:var(--os);color:var(--ok);font-weight:500;margin-bottom:12px;font-size:14px}
-.led{border-radius:12px;padding:13px 14px;margin-bottom:10px;background:var(--ams)}.led b{display:block;color:var(--am)}.led p{margin:4px 0 0;font-size:13.5px}
-.mut{color:var(--mu);font-size:14px;margin:0}
-.pg{max-width:1000px;margin:0 auto;padding:36px clamp(18px,5vw,48px) 80px}.pg h2{margin-bottom:6px}.pg h3{margin:34px 0 8px}
-.s4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:22px 0 4px}.s4 div{border:1px solid var(--ln);border-radius:14px;padding:14px}.s4 b{display:block;font-family:"Instrument Serif",serif;font-size:30px;font-weight:400;line-height:1.1}.s4 span{color:var(--mu);font-size:14px}.s4 .w{background:var(--ams);border-color:transparent}.s4 .g{background:var(--os);border-color:transparent}
-.chips{display:flex;gap:8px;margin:18px 0 6px;flex-wrap:wrap}.chip{font:inherit;font-weight:500;background:#fff;border:1px solid var(--ln);border-radius:99px;padding:7px 15px;cursor:pointer;color:var(--mu)}.chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
-.rem{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;padding:16px 0;border-top:1px solid var(--ln)}
-tr.dn td{color:var(--mu);text-decoration:line-through}
-.fm{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}.fm input,.fm select{font:inherit;padding:10px 12px;border:1px solid var(--ln);border-radius:10px;color:var(--ink);background:#fff}.fm input{flex:1;min-width:200px}
-.tgl{display:flex;gap:10px;align-items:flex-start;padding:14px 0;border-top:1px solid var(--ln)}
-.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:#fff;padding:11px 18px;border-radius:999px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:9}.toast.on{opacity:1}
-.flag-banner{display:none;border-radius:12px;padding:10px 14px;margin:0 0 14px;font-size:13.5px;line-height:1.5;border:1px solid transparent}
-.flag-banner.am{display:block;background:var(--ams);border-color:#EDD9A3;color:var(--am)}
-.flag-banner.ok{display:block;background:var(--os);border-color:#A4D4BA;color:var(--ok)}
-@media(max-width:980px){.hero,.flow{grid-template-columns:1fr}.dl{grid-template-columns:1fr}.dl dt{border-bottom:0;padding-bottom:0}.dl dd{border-top:0;padding-top:4px}.app{grid-template-columns:1fr}.col+.col{border-left:0;border-top:1px solid var(--ln)}nav{flex-wrap:wrap;gap:6px 16px}header{flex-wrap:wrap}.s4{grid-template-columns:1fr 1fr}.wide{overflow-x:auto}}
-@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
-.banner{background:var(--ams);color:var(--am);padding:8px 16px;text-align:center;font-size:14px;font-weight:500}.lnk{font:inherit;font-size:12px;color:var(--ac);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline}.dot.am{background:var(--am);border-color:var(--am)}</style></head><body>
-<div class="banner" id="banner" hidden>Demo mode. This replays a recorded run.</div>
-<header><a class="brand" href="#home">Quill</a><nav><a href="#home" data-n="home">Overview</a><a href="#app" data-n="app">Workspace</a><a href="#dashboard" data-n="dashboard">Dashboard</a></nav><a class="btn sm" href="#start">Try it</a></header>
+<html lang="en">
 
-<section data-page="home" class="on"><div class="wrap">
-<div class="hero"><div><h1>Your client call ends. Quill does the rest.</h1>
-<p class="l">For freelancers, consultants, coaches and tutors. Drop in the recording of a call and Quill lists who promised what, spots clients who are going quiet, and drafts the follow-up for you to approve. It all runs on your own laptop.</p>
-<a class="btn" href="#start">Try it with a sample call</a></div>
-<div class="card mock"><h4>Call with Dana, 34 minutes</h4><div class="s">Freelance brand identity project</div>
-<div class="pr"><b>Dana</b><span>Send brand guidelines by Friday</span></div>
-<div class="pr"><b>You</b><span>Send revised logo draft Monday</span></div>
-<div class="pr"><b>Dana</b><span>"Maybe approve the logo next week" (unclear, asks you)</span></div>
-<div class="pr"><b>Heads up</b><span>Dana missed 2 of the last 4 calls. A friendly check-in is drafted.</span></div></div></div>
-<div class="sec"><h2>How it fits into your week</h2>
-<div class="flow"><div><span>Before</span><h3>Record as usual</h3><p>Zoom, Google Meet, a phone voice memo, or your laptop mic in person. Quill never joins your calls.</p></div>
-<div><span>After the call</span><h3>Drop the file into Quill</h3><p>It turns the speech into text on your laptop, then reads it the way a good assistant would.</p></div>
-<div><span>Two minutes later</span><h3>Approve what it drafted</h3><p>A list of promises, a note on who needs attention, and ready emails. Nothing is sent until you say so.</p></div></div></div>
-<div class="sec"><h2>The same loop, for different kinds of work</h2>
-<dl class="dl"><dt>Freelancers</dt><dd>Tracks deliverables and invoices, and notices a client who keeps delaying a decision.</dd>
-<dt>Consultants</dt><dd>Tracks data requests and scope changes, and keeps a steady client on a light touch.</dd>
-<dt>Coaches and tutors</dt><dd>Tracks practice plans, and catches a student who is about to skip a few weeks.</dd></dl></div>
-<div class="sec"><h2>What leaves your laptop</h2>
-<div class="wide"><table><thead><tr><th>Data</th><th>What happens to it</th><th></th></tr></thead><tbody>
-<tr><td>Call recording</td><td>Turned into text by an open speech model on your laptop</td><td><span class="pill g">Stays local</span></td></tr>
-<tr><td>Transcript and notes</td><td>Stored and searched on your laptop</td><td><span class="pill g">Stays local</span></td></tr>
-<tr><td>Attendance numbers, no names</td><td>Sent to a prediction service, or run locally</td><td><span class="pill a">Shown in your ledger</span></td></tr>
-<tr><td>A search topic for an attachment</td><td>Sent to a web search provider</td><td><span class="pill a">Shown in your ledger</span></td></tr></tbody></table></div></div>
-<footer>Prototype with synthetic data. Quill drafts follow-ups and is not a legal, medical or compliance tool.</footer></div></section>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Quill: what to do after every client call</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #fff;
+      --pn: #F4F5F7;
+      --ink: #111418;
+      --mu: #5B6470;
+      --ln: #E3E6EA;
+      --ac: #23408E;
+      --as: #E8EDF8;
+      --ok: #1A7F5A;
+      --os: #E5F3EC;
+      --am: #9A5B00;
+      --ams: #FBF0DC;
+      box-sizing: border-box;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 0px)
+    }
 
-<section data-page="start"><div class="ob">
-<div class="p" id="sp">Step 1 of 3</div><div class="bar"><i id="sb" style="width:33%"></i></div>
-<div class="stp" id="s1"><h2>What kind of work do you do?</h2><p class="sub">Quill sets up a sample client that fits.</p>
-<button class="opt on" data-r="freelancer"><b>Freelancer</b><small>Design, writing, development, marketing</small></button>
-<button class="opt" data-r="consultant"><b>Consultant</b><small>Advice and projects for business clients</small></button>
-<button class="opt" data-r="coach"><b>Coach or tutor</b><small>Sports, career, business or subject coaching</small></button></div>
-<div class="stp" id="s2" hidden><h2>How do you record your calls?</h2><p class="sub">Quill never joins a call. You record the way you already do, then drop the file in.</p>
-<button class="opt on" data-s="1"><b>Zoom or Google Meet recordings</b><small>Download the audio file after the call</small></button>
-<button class="opt on" data-s="1"><b>Phone voice memo</b><small>Record on the phone and send the file to your laptop</small></button>
-<button class="opt" data-s="1"><b>In person, laptop mic</b><small>Record with any audio app</small></button></div>
-<div class="stp" id="s3" hidden><h2>Meet your sample client</h2><p class="sub" id="s3t"></p><div class="card" style="padding:20px;margin-top:14px" id="s3c"></div></div>
-<div class="nv"><button class="btn ln" id="bk">Back</button><button class="btn" id="nx">Continue</button></div></div></section>
+    *,
+    *:before,
+    *:after {
+      box-sizing: inherit
+    }
 
-<section data-page="app"><div class="app">
-<aside class="col side">
-  <div class="side-head">
-    <button id="sb-toggle" class="icon-btn" title="Toggle Sidebar">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/></svg>
-    </button>
-    <span class="lab side-title" style="margin:0">Clients</span>
-    <button id="add-cl-btn" class="icon-btn" title="Add Client" style="margin-left:auto">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
-    </button>
-  </div>
-  <div id="cls"></div>
-</aside>
-<main class="col" id="mn"><div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
-  <button id="sb-expand" class="icon-btn" title="Open Sidebar">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/></svg>
-  </button>
-  <h3 style="margin:0">Add a call with <span id="ct">Dana</span></h3>
-</div>
-<p class="mut" style="margin-top:2px">Drop in the recording from Zoom, Meet or your phone. It stays on this laptop.</p>
-<div id="flag-banner" class="flag-banner" role="status" aria-live="polite"></div>
-<label class="drop" id="dz"><input type="file" id="fl" accept="audio/*,video/*" hidden><b id="dt">Choose a recording</b><span id="ds">or use the sample call below</span></label>
-<div id="player-box" class="player-box" hidden>
-  <div class="player-row">
-    <button id="ply-btn" class="ply-btn" title="Play / Pause audio">
-      <svg id="ply-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-    </button>
-    <div class="player-track">
-      <div class="player-info">
-        <span id="ply-title" style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Call Recording</span>
-        <span id="ply-time" class="mut">0:00 / 0:00</span>
+    html {
+      scroll-padding-top: env(safe-area-inset-top, 0px)
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font: 15px/1.6 Geist, system-ui, sans-serif
+    }
+
+    h1,
+    h2,
+    h3 {
+      font-family: "Instrument Serif", Georgia, serif;
+      font-weight: 400;
+      margin: 0;
+      letter-spacing: -.015em
+    }
+
+    h1 {
+      font-size: clamp(44px, 7vw, 86px);
+      line-height: 1
+    }
+
+    h2 {
+      font-size: clamp(28px, 3.6vw, 40px);
+      line-height: 1.1
+    }
+
+    h3 {
+      font-size: 22px
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      gap: 26px;
+      padding: 18px clamp(18px, 5vw, 64px)
+    }
+
+    .brand {
+      font-family: "Instrument Serif", serif;
+      font-size: 28px;
+      text-decoration: none;
+      color: var(--ink)
+    }
+
+    nav {
+      display: flex;
+      gap: 22px;
+      flex: 1
+    }
+
+    nav a {
+      text-decoration: none;
+      color: var(--mu);
+      font-weight: 500
+    }
+
+    nav a.on {
+      color: var(--ink)
+    }
+
+    .btn {
+      font: inherit;
+      font-weight: 600;
+      background: var(--ink);
+      color: #fff;
+      border: 0;
+      border-radius: 999px;
+      padding: 12px 22px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block
+    }
+
+    .btn.ln {
+      background: transparent;
+      color: var(--ink);
+      border: 1px solid var(--ln)
+    }
+
+    .btn.sm {
+      padding: 8px 15px;
+      font-size: 14px
+    }
+
+    .btn.ac {
+      background: var(--ac)
+    }
+
+    .btn:disabled {
+      opacity: .4;
+      cursor: default
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--ac);
+      outline-offset: 2px
+    }
+
+    [data-page] {
+      display: none
+    }
+
+    [data-page].on {
+      display: block
+    }
+
+    .wrap {
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 0 clamp(18px, 5vw, 64px)
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 56px;
+      align-items: center;
+      padding: 50px 0 84px
+    }
+
+    .l {
+      font-size: 20px;
+      color: var(--mu);
+      max-width: 46ch;
+      margin: 24px 0 30px;
+      line-height: 1.5
+    }
+
+    .card {
+      border: 1px solid var(--ln);
+      border-radius: 16px;
+      background: #fff
+    }
+
+    .mock {
+      padding: 24px;
+      box-shadow: 0 18px 50px -26px rgba(17, 20, 24, .3)
+    }
+
+    .mock h4 {
+      margin: 0 0 4px;
+      font-weight: 600
+    }
+
+    .mock .s {
+      color: var(--mu);
+      font-size: 14px;
+      margin-bottom: 14px
+    }
+
+    .pr {
+      display: flex;
+      gap: 10px;
+      padding: 10px 0;
+      border-top: 1px solid var(--ln)
+    }
+
+    .pr b {
+      min-width: 46px;
+      font-weight: 600
+    }
+
+    .pr span {
+      color: var(--mu)
+    }
+
+    .sec {
+      padding: 80px 0;
+      border-top: 1px solid var(--ln)
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 40px;
+      margin-top: 34px
+    }
+
+    .flow h3 {
+      margin: 8px 0
+    }
+
+    .flow p {
+      color: var(--mu);
+      margin: 0
+    }
+
+    .flow span {
+      color: var(--ac);
+      font-weight: 600
+    }
+
+    .dl {
+      display: grid;
+      grid-template-columns: 230px 1fr;
+      margin-top: 30px
+    }
+
+    .dl dt,
+    .dl dd {
+      margin: 0;
+      padding: 18px 0;
+      border-top: 1px solid var(--ln)
+    }
+
+    .dl dt {
+      font-weight: 600
+    }
+
+    .dl dd {
+      color: var(--mu);
+      max-width: 62ch
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse
+    }
+
+    th,
+    td {
+      text-align: left;
+      padding: 12px 12px 12px 0;
+      border-top: 1px solid var(--ln);
+      vertical-align: top
+    }
+
+    th {
+      font-weight: 500;
+      color: var(--mu);
+      font-size: 14px;
+      border-top: 0
+    }
+
+    .pill {
+      display: inline-block;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 3px 11px;
+      border-radius: 99px;
+      white-space: nowrap
+    }
+
+    .pill.g {
+      background: var(--os);
+      color: var(--ok)
+    }
+
+    .pill.a {
+      background: var(--ams);
+      color: var(--am)
+    }
+
+    .pill.b {
+      background: var(--as);
+      color: var(--ac)
+    }
+
+    footer {
+      padding: 36px 0 56px;
+      color: var(--mu);
+      border-top: 1px solid var(--ln);
+      font-size: 14px
+    }
+
+    .ob {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 40px clamp(18px, 5vw, 40px) 80px
+    }
+
+    .ob .p {
+      color: var(--mu);
+      font-weight: 500;
+      margin-bottom: 14px
+    }
+
+    .bar {
+      height: 4px;
+      background: var(--ln);
+      border-radius: 2px;
+      margin-bottom: 34px
+    }
+
+    .bar i {
+      display: block;
+      height: 100%;
+      background: var(--ac);
+      border-radius: 2px;
+      transition: width .3s
+    }
+
+    .opt {
+      display: block;
+      width: 100%;
+      text-align: left;
+      font: inherit;
+      background: #fff;
+      border: 1px solid var(--ln);
+      border-radius: 14px;
+      padding: 16px 18px;
+      margin-top: 12px;
+      cursor: pointer;
+      color: var(--ink)
+    }
+
+    .opt small {
+      display: block;
+      color: var(--mu)
+    }
+
+    .opt.on {
+      border-color: var(--ac);
+      box-shadow: 0 0 0 1px var(--ac);
+      background: var(--as)
+    }
+
+    .ob .sub {
+      color: var(--mu);
+      margin: 10px 0 8px;
+      font-size: 17px
+    }
+
+    .nv {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 34px
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: 240px minmax(0, 1fr) 470px;
+      min-height: calc(100vh - 72px);
+      border-top: 1px solid var(--ln);
+      transition: grid-template-columns .2s ease
+    }
+
+    .app.collapsed {
+      grid-template-columns: 0 minmax(0, 1fr) 470px
+    }
+
+    .app.collapsed .side {
+      display: none
+    }
+
+    .app.collapsed #sb-expand {
+      display: inline-flex
+    }
+
+    #sb-expand {
+      display: none
+    }
+
+    .side-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px
+    }
+
+    .icon-btn {
+      font: inherit;
+      background: none;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      padding: 6px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--ink);
+      transition: all .15s
+    }
+
+    .icon-btn:hover {
+      background: #fff;
+      border-color: var(--ln)
+    }
+
+    .col {
+      padding: 24px
+    }
+
+    .col+.col {
+      border-left: 1px solid var(--ln)
+    }
+
+    .side {
+      background: var(--pn)
+    }
+
+    .lab {
+      font-size: 13px;
+      color: var(--mu);
+      font-weight: 500;
+      margin: 0 0 8px
+    }
+
+    .cl-row {
+      position: relative;
+      display: flex;
+      align-items: center;
+      margin-bottom: 4px
+    }
+
+    .cl-row .cl {
+      flex: 1;
+      margin-bottom: 0
+    }
+
+    .del-cl-btn {
+      background: none;
+      border: 0;
+      padding: 6px;
+      cursor: pointer;
+      color: var(--mu);
+      opacity: .6;
+      border-radius: 6px;
+      transition: all .15s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      position: absolute;
+      right: 8px
+    }
+
+    .del-cl-btn:hover {
+      color: #D9383A;
+      background: #FDE8E8;
+      opacity: 1
+    }
+
+    .cl {
+      display: block;
+      width: 100%;
+      text-align: left;
+      font: inherit;
+      background: none;
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 12px;
+      cursor: pointer;
+      color: var(--ink);
+      margin-bottom: 4px
+    }
+
+    .cl small {
+      display: block;
+      color: var(--mu);
+      line-height: 1.35
+    }
+
+    .cl.on {
+      background: #fff;
+      box-shadow: 0 0 0 1px var(--ln)
+    }
+
+    .player-box {
+      background: var(--pn);
+      border: 1px solid var(--ln);
+      border-radius: 14px;
+      padding: 12px 16px;
+      margin: 14px 0 16px
+    }
+
+    .player-row {
+      display: flex;
+      align-items: center;
+      gap: 12px
+    }
+
+    .ply-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--ink);
+      color: #fff;
+      border: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background .15s
+    }
+
+    .ply-btn:hover {
+      background: var(--ac)
+    }
+
+    .player-track {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      min-width: 0
+    }
+
+    .player-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px
+    }
+
+    .player-seek {
+      width: 100%;
+      accent-color: var(--ac);
+      cursor: pointer;
+      height: 4px;
+      margin: 0
+    }
+
+    .speed-selector {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+      flex-shrink: 0
+    }
+
+    .spd-btn {
+      font: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 8px;
+      border-radius: 6px;
+      border: 1px solid var(--ln);
+      background: #fff;
+      color: var(--mu);
+      cursor: pointer;
+      transition: all .15s
+    }
+
+    .spd-btn.on {
+      background: var(--ink);
+      color: #fff;
+      border-color: var(--ink)
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(17, 20, 24, .4);
+      backdrop-filter: blur(3px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 99;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s
+    }
+
+    .modal.on {
+      opacity: 1;
+      pointer-events: auto
+    }
+
+    .modal-card {
+      background: #fff;
+      border: 1px solid var(--ln);
+      border-radius: 18px;
+      padding: 26px;
+      width: 92%;
+      max-width: 440px;
+      box-shadow: 0 24px 60px -20px rgba(0, 0, 0, .25)
+    }
+
+    .modal-card h3 {
+      margin: 0 0 4px
+    }
+
+    .modal-field {
+      margin: 14px 0 0
+    }
+
+    .modal-field label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--mu);
+      margin-bottom: 6px
+    }
+
+    .modal-field input,
+    .modal-field select {
+      width: 100%;
+      font: inherit;
+      padding: 10px 12px;
+      border: 1px solid var(--ln);
+      border-radius: 10px;
+      color: var(--ink);
+      background: #fff
+    }
+
+    .modal-field select {
+      cursor: pointer
+    }
+
+    .drop {
+      display: block;
+      border: 1.5px dashed #C3C9D6;
+      border-radius: 14px;
+      padding: 26px;
+      text-align: center;
+      color: var(--mu);
+      cursor: pointer;
+      margin: 16px 0 12px
+    }
+
+    .drop b {
+      color: var(--ink);
+      display: block;
+      margin-bottom: 2px
+    }
+
+    .drop.has {
+      border-style: solid;
+      border-color: var(--ok);
+      background: var(--os);
+      color: var(--ok)
+    }
+
+    .drop.has b {
+      color: var(--ok)
+    }
+
+    .acts {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap
+    }
+
+    .st {
+      display: grid;
+      grid-template-columns: 22px 1fr auto;
+      gap: 12px;
+      padding: 13px 0;
+      border-bottom: 1px solid var(--ln);
+      opacity: 0;
+      transform: translateY(5px);
+      transition: all .35s
+    }
+
+    .st.on {
+      opacity: 1;
+      transform: none
+    }
+
+    .st b {
+      font-weight: 600
+    }
+
+    .st p {
+      margin: 3px 0 0;
+      color: var(--mu)
+    }
+
+    .st .t {
+      display: none;
+      color: var(--ac);
+      font-size: 13px;
+      margin-top: 3px
+    }
+
+    .tech .st .t {
+      display: block
+    }
+
+    .st .ms {
+      color: var(--mu);
+      font-size: 13px
+    }
+
+    .dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 2px solid var(--ac);
+      margin-top: 5px
+    }
+
+    .dot.sp {
+      border-top-color: transparent;
+      animation: sp .8s linear infinite
+    }
+
+    .dot.ok {
+      background: var(--ac)
+    }
+
+    .dot.am {
+      background: var(--am);
+      border-color: var(--am)
+    }
+
+    @keyframes sp {
+      to {
+        transform: rotate(360deg)
+      }
+    }
+
+    .tg {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--mu);
+      font-size: 14px;
+      margin: 12px 0 4px
+    }
+
+    .sum {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin: 4px 0 8px
+    }
+
+    .sum div {
+      border: 1px solid var(--ln);
+      border-radius: 14px;
+      padding: 14px
+    }
+
+    .sum b {
+      display: block;
+      font-family: "Instrument Serif", serif;
+      font-size: 28px;
+      font-weight: 400;
+      line-height: 1.1
+    }
+
+    .sum span {
+      color: var(--mu);
+      font-size: 14px
+    }
+
+    .sum .w {
+      background: var(--ams);
+      border-color: transparent
+    }
+
+    .sum .g {
+      background: var(--os);
+      border-color: transparent
+    }
+
+    .res {
+      display: none
+    }
+
+    .res.on {
+      display: block
+    }
+
+    .res h3 {
+      margin: 26px 0 8px
+    }
+
+    .q {
+      border: 1px solid var(--ln);
+      border-radius: 14px;
+      padding: 16px;
+      margin-top: 12px
+    }
+
+    .q textarea {
+      width: 100%;
+      font: inherit;
+      font-size: 14px;
+      border: 1px solid var(--ln);
+      border-radius: 10px;
+      padding: 10px;
+      margin: 8px 0;
+      min-height: 170px;
+      resize: vertical;
+      color: var(--ink)
+    }
+
+    .q.done {
+      background: var(--pn);
+      border-color: transparent;
+      color: var(--ok);
+      font-weight: 500
+    }
+
+    .loc {
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: var(--os);
+      color: var(--ok);
+      font-weight: 500;
+      margin-bottom: 12px;
+      font-size: 14px
+    }
+
+    .led {
+      border-radius: 12px;
+      padding: 13px 14px;
+      margin-bottom: 10px;
+      background: var(--ams)
+    }
+
+    .led b {
+      display: block;
+      color: var(--am)
+    }
+
+    .led p {
+      margin: 4px 0 0;
+      font-size: 13.5px
+    }
+
+    .mut {
+      color: var(--mu);
+      font-size: 14px;
+      margin: 0
+    }
+
+    .pg {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 36px clamp(18px, 5vw, 48px) 80px
+    }
+
+    .pg h2 {
+      margin-bottom: 6px
+    }
+
+    .pg h3 {
+      margin: 34px 0 8px
+    }
+
+    .s4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin: 22px 0 4px
+    }
+
+    .s4 div {
+      border: 1px solid var(--ln);
+      border-radius: 14px;
+      padding: 14px
+    }
+
+    .s4 b {
+      display: block;
+      font-family: "Instrument Serif", serif;
+      font-size: 30px;
+      font-weight: 400;
+      line-height: 1.1
+    }
+
+    .s4 span {
+      color: var(--mu);
+      font-size: 14px
+    }
+
+    .s4 .w {
+      background: var(--ams);
+      border-color: transparent
+    }
+
+    .s4 .g {
+      background: var(--os);
+      border-color: transparent
+    }
+
+    .chips {
+      display: flex;
+      gap: 8px;
+      margin: 18px 0 6px;
+      flex-wrap: wrap
+    }
+
+    .chip {
+      font: inherit;
+      font-weight: 500;
+      background: #fff;
+      border: 1px solid var(--ln);
+      border-radius: 99px;
+      padding: 7px 15px;
+      cursor: pointer;
+      color: var(--mu)
+    }
+
+    .chip.on {
+      background: var(--ink);
+      color: #fff;
+      border-color: var(--ink)
+    }
+
+    .rem {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      padding: 16px 0;
+      border-top: 1px solid var(--ln)
+    }
+
+    tr.dn td {
+      color: var(--mu);
+      text-decoration: line-through
+    }
+
+    .fm {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px
+    }
+
+    .fm input,
+    .fm select {
+      font: inherit;
+      padding: 10px 12px;
+      border: 1px solid var(--ln);
+      border-radius: 10px;
+      color: var(--ink);
+      background: #fff
+    }
+
+    .fm input {
+      flex: 1;
+      min-width: 200px
+    }
+
+    .tgl {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      padding: 14px 0;
+      border-top: 1px solid var(--ln)
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+      transform: translateX(-50%);
+      background: var(--ink);
+      color: #fff;
+      padding: 11px 18px;
+      border-radius: 999px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s;
+      z-index: 9
+    }
+
+    .toast.on {
+      opacity: 1
+    }
+
+    .flag-banner {
+      display: none;
+      border-radius: 12px;
+      padding: 10px 14px;
+      margin: 0 0 14px;
+      font-size: 13.5px;
+      line-height: 1.5;
+      border: 1px solid transparent
+    }
+
+    .flag-banner.am {
+      display: block;
+      background: var(--ams);
+      border-color: #EDD9A3;
+      color: var(--am)
+    }
+
+    .flag-banner.ok {
+      display: block;
+      background: var(--os);
+      border-color: #A4D4BA;
+      color: var(--ok)
+    }
+
+    @media(max-width:980px) {
+
+      .hero,
+      .flow {
+        grid-template-columns: 1fr
+      }
+
+      .dl {
+        grid-template-columns: 1fr
+      }
+
+      .dl dt {
+        border-bottom: 0;
+        padding-bottom: 0
+      }
+
+      .dl dd {
+        border-top: 0;
+        padding-top: 4px
+      }
+
+      .app {
+        grid-template-columns: 1fr
+      }
+
+      .col+.col {
+        border-left: 0;
+        border-top: 1px solid var(--ln)
+      }
+
+      nav {
+        flex-wrap: wrap;
+        gap: 6px 16px
+      }
+
+      header {
+        flex-wrap: wrap
+      }
+
+      .s4 {
+        grid-template-columns: 1fr 1fr
+      }
+
+      .wide {
+        overflow-x: auto
+      }
+    }
+
+    @media(prefers-reduced-motion:reduce) {
+      * {
+        transition: none !important;
+        animation: none !important
+      }
+    }
+
+    .banner {
+      background: var(--ams);
+      color: var(--am);
+      padding: 8px 16px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500
+    }
+
+    .lnk {
+      font: inherit;
+      font-size: 12px;
+      color: var(--ac);
+      background: none;
+      border: 0;
+      padding: 0;
+      cursor: pointer;
+      text-decoration: underline
+    }
+
+    .dot.am {
+      background: var(--am);
+      border-color: var(--am)
+    }
+  </style>
+</head>
+
+<body>
+  <div class="banner" id="banner" hidden>Demo mode. This replays a recorded run.</div>
+  <header><a class="brand" href="#home">Quill</a>
+    <nav><a href="#home" data-n="home">Overview</a><a href="#app" data-n="app">Workspace</a><a href="#dashboard"
+        data-n="dashboard">Dashboard</a></nav><a class="btn sm" href="#start">Try it</a>
+  </header>
+
+  <section data-page="home" class="on">
+    <div class="wrap">
+      <div class="hero">
+        <div>
+          <h1>Your client call ends. Quill does the rest.</h1>
+          <p class="l">For freelancers, consultants, coaches and tutors. Drop in the recording of a call and Quill lists
+            who promised what, spots clients who are going quiet, and drafts the follow-up for you to approve. It all
+            runs on your own laptop.</p>
+          <a class="btn" href="#start">Try it with a sample call</a>
+        </div>
+        <div class="card mock">
+          <h4>Call with Dana, 34 minutes</h4>
+          <div class="s">Freelance brand identity project</div>
+          <div class="pr"><b>Dana</b><span>Send brand guidelines by Friday</span></div>
+          <div class="pr"><b>You</b><span>Send revised logo draft Monday</span></div>
+          <div class="pr"><b>Dana</b><span>"Maybe approve the logo next week" (unclear, asks you)</span></div>
+          <div class="pr"><b>Heads up</b><span>Dana missed 2 of the last 4 calls. A friendly check-in is drafted.</span>
+          </div>
+        </div>
       </div>
-      <input type="range" id="ply-seek" min="0" max="100" value="0" class="player-seek">
-    </div>
-    <div class="speed-selector">
-      <button class="spd-btn" data-spd="0.75">0.75x</button>
-      <button class="spd-btn on" data-spd="1">1x</button>
-      <button class="spd-btn" data-spd="1.25">1.25x</button>
-      <button class="spd-btn" data-spd="1.5">1.5x</button>
-      <button class="spd-btn" data-spd="2">2x</button>
-    </div>
-  </div>
-  <audio id="aud" preload="metadata"></audio>
-</div>
-<div class="acts"><button class="btn ac" id="go" disabled>Process this call</button><button class="btn ln" id="sm">Use the sample call</button></div>
-<div class="tg" id="tg" hidden><input type="checkbox" id="tk"><label for="tk">Show technical details</label></div>
-<div id="steps"></div></main>
-<aside class="col" id="rt"><div id="tr" hidden style="margin-bottom:26px"><div class="loc">Audio, transcript and notes stayed on this laptop</div><p class="lab">Left your laptop</p><div id="led"></div></div>
-<p class="lab" id="rph">What Quill found</p><p class="mut" id="rpt">After you process a call, the promises, any question for you, and the drafts to approve will appear here.</p><div class="res" id="res"></div></aside></div></section>
-<section data-page="dashboard"><div class="pg"><h2>Dashboard</h2><p class="mut">Everything open across all your clients, in one place.</p>
-<div class="s4" id="td-stats"></div>
-<h3>Needs you</h3><div class="wide"><table><tbody id="td-list"></tbody></table></div>
-<h3>Coming up</h3><div id="td-rem"></div>
-<h3>Clients at a glance</h3><div class="wide"><table><thead><tr><th>Client</th><th>Last call</th><th>Open promises</th><th>Status</th></tr></thead><tbody id="td-cl"></tbody></table></div>
-<p style="margin-top:26px"><a class="btn" href="#app">Add a call</a></p></div></section>
-<div class="modal" id="cl-modal">
-  <div class="modal-card">
-    <h3>Add a new client</h3>
-    <p class="mut" style="margin:4px 0 16px;font-size:14px">Track calls, promises, and retention for this client.</p>
-    <div class="modal-field">
-      <label for="new-cl-name">Client Name</label>
-      <input type="text" id="new-cl-name" placeholder="e.g. Maya Lin" required>
-    </div>
-    <div class="modal-field">
-      <label for="new-cl-role">Work Type</label>
-      <select id="new-cl-role">
-        <option value="freelancer">Freelancer (Design, dev, writing)</option>
-        <option value="consultant">Consultant (Operations, advisory)</option>
-        <option value="coach">Coach or tutor (Lessons, guidance)</option>
-      </select>
-    </div>
-    <div class="modal-field">
-      <label for="new-cl-gig">Project or Retainer Details</label>
-      <input type="text" id="new-cl-gig" placeholder="e.g. Brand redesign, quarterly contract">
-    </div>
-    <div class="acts" style="margin-top:20px;justify-content:flex-end">
-      <button class="btn sm ln" id="cl-cancel-btn">Cancel</button>
-      <button class="btn sm ac" id="cl-save-btn">Add client</button>
-    </div>
-  </div>
-</div>
-<div class="toast" id="toast"></div>
-<script>
-const $=s=>document.querySelector(s),pages=[...document.querySelectorAll('[data-page]')];
-const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const ROLE={freelancer:'Freelancer',consultant:'Consultant',coach:'Coach or tutor'};
-function route(){const h=(location.hash||'#home').slice(1);pages.forEach(x=>x.classList.toggle('on',x.dataset.page===h));document.querySelectorAll('nav a').forEach(a=>a.classList.toggle('on',a.dataset.n===h));scrollTo(0,0);if(h==='dashboard')loadDash()}
-addEventListener('hashchange',route);
-function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('on');setTimeout(()=>e.classList.remove('on'),1900)}
-const J=async(u,o)=>{let r;try{r=await fetch(u,o)}catch{throw new Error('Cannot reach the Quill server.')}const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error?.message||'Something went wrong.');return d};
-const POST=(u,b)=>J(u,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b||{})});
-const LED0='<p class="mut">Nothing yet. Anything sent out will be listed here with its exact contents.</p>';
-let clients=[],key=null,run=0,ready=null,es=null,pend=null,pickRole='freelancer',step=1;
-const cl=()=>clients.find(c=>c.id===key);
-const sampleAudioMap={
-  dana:'/demo_recordings/dana_call_recording.wav',
-  marcus:'/demo_recordings/marcus_call_recording.wav',
-  ines:'/demo_recordings/ines_call_recording.wav'
-};
-const aud=$('#aud');
-let audPlaying=false;
-function fmtTime(sec){
-  if(isNaN(sec)||sec<0)return '0:00';
-  const m=Math.floor(sec/60),s=Math.floor(sec%60);
-  return `${m}:${s<10?'0':''}${s}`;
-}
-function updatePlayBtn(){
-  $('#ply-icon').innerHTML=audPlaying
-    ?'<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>'
-    :'<polygon points="5 3 19 12 5 21 5 3"/>';
-}
-$('#ply-btn').onclick=()=>{
-  if(!aud.src)return;
-  if(aud.paused)aud.play();else aud.pause();
-};
-aud.onplay=()=>{audPlaying=true;updatePlayBtn()};
-aud.onpause=()=>{audPlaying=false;updatePlayBtn()};
-aud.onended=()=>{audPlaying=false;updatePlayBtn();$('#ply-seek').value=0};
-aud.ontimeupdate=()=>{
-  if(aud.duration){
-    $('#ply-seek').value=(aud.currentTime/aud.duration)*100;
-    $('#ply-time').textContent=`${fmtTime(aud.currentTime)} / ${fmtTime(aud.duration)}`;
-  }
-};
-$('#ply-seek').oninput=e=>{
-  if(aud.duration)aud.currentTime=(e.target.value/100)*aud.duration;
-};
-document.querySelectorAll('.spd-btn').forEach(btn=>{
-  btn.onclick=()=>{
-    document.querySelectorAll('.spd-btn').forEach(b=>b.classList.remove('on'));
-    btn.classList.add('on');
-    aud.playbackRate=parseFloat(btn.dataset.spd);
-  };
-});
-$('#sb-toggle').onclick=()=>$('.app').classList.add('collapsed');
-$('#sb-expand').onclick=()=>$('.app').classList.remove('collapsed');
-$('#add-cl-btn').onclick=()=>{
-  $('#cl-modal').classList.add('on');
-  $('#new-cl-name').value='';
-  $('#new-cl-gig').value='';
-  $('#new-cl-name').focus();
-};
+      <div class="sec">
+        <h2>How it fits into your week</h2>
+        <div class="flow">
+          <div><span>Before</span>
+            <h3>Record as usual</h3>
+            <p>Zoom, Google Meet, a phone voice memo, or your laptop mic in person. Quill never joins your calls.</p>
+          </div>
+          <div><span>After the call</span>
+            <h3>Drop the file into Quill</h3>
+            <p>It turns the speech into text on your laptop, then reads it the way a good assistant would.</p>
+          </div>
+          <div><span>Two minutes later</span>
+            <h3>Approve what it drafted</h3>
+            <p>A list of promises, a note on who needs attention, and ready emails. Nothing is sent until you say so.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="sec">
+        <h2>The same loop, for different kinds of work</h2>
+        <dl class="dl">
+          <dt>Freelancers</dt>
+          <dd>Tracks deliverables and invoices, and notices a client who keeps delaying a decision.</dd>
+          <dt>Consultants</dt>
+          <dd>Tracks data requests and scope changes, and keeps a steady client on a light touch.</dd>
+          <dt>Coaches and tutors</dt>
+          <dd>Tracks practice plans, and catches a student who is about to skip a few weeks.</dd>
+        </dl>
+      </div>
+      <div class="sec">
+        <h2>What leaves your laptop</h2>
+        <div class="wide">
+          <table>
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>What happens to it</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Call recording</td>
+                <td>Turned into text by an open speech model on your laptop</td>
+                <td><span class="pill g">Stays local</span></td>
+              </tr>
+              <tr>
+                <td>Transcript and notes</td>
+                <td>Stored and searched on your laptop</td>
+                <td><span class="pill g">Stays local</span></td>
+              </tr>
+              <tr>
+                <td>Attendance numbers, no names</td>
+                <td>Sent to a prediction service, or run locally</td>
+                <td><span class="pill a">Shown in your ledger</span></td>
+              </tr>
+              <tr>
+                <td>A search topic for an attachment</td>
+                <td>Sent to a web search provider</td>
+                <td><span class="pill a">Shown in your ledger</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="sec" style="text-align:center;padding:80px 0">
+        <h2 style="max-width:18ch;margin:0 auto">Ready to reclaim your time after every call?</h2>
+        <p class="l" style="margin:18px auto 32px;text-align:center;max-width:44ch">No accounts, no cloud, no bot
+          joining your calls. Just drop in the recording and Quill does the rest.</p>
+        <a class="btn" href="#start" style="font-size:17px;padding:15px 32px">Try it with a sample call</a>
+        <p class="mut" style="margin-top:14px">Works offline. Your data never leaves your machine.</p>
+      </div>
+      <footer style="display:flex;align-items:center;justify-content:space-between;padding:32px 0 48px;border-top:1px solid var(--ln);flex-wrap:wrap;gap:16px;width:100%">
+        <div style="display:flex;align-items:center;gap:14px">
+          <span style="font-family:'Instrument Serif',serif;font-size:22px;color:var(--ink)">Quill</span>
+          <span style="color:var(--mu);font-size:13px">Your post-call co-pilot. Runs entirely on your laptop.</span>
+        </div>
 
-const CORE_CLIENTS=['dana','marcus','ines'];
-function renderClients(){
-  $('#cls').innerHTML=clients.map(c=>`
+        <nav style="display:flex;gap:24px;font-size:14px;flex:initial;margin-left:auto;justify-content:flex-end">
+          <a href="#home" style="color:var(--mu);text-decoration:none;font-weight:500">Overview</a>
+          <a href="#app" style="color:var(--mu);text-decoration:none;font-weight:500">Workspace</a>
+          <a href="#dashboard" style="color:var(--mu);text-decoration:none;font-weight:500">Dashboard</a>
+        </nav>
+      </footer>
+    </div>
+  </section>
+
+  <section data-page="start">
+    <div class="ob">
+      <div class="p" id="sp">Step 1 of 3</div>
+      <div class="bar"><i id="sb" style="width:33%"></i></div>
+      <div class="stp" id="s1">
+        <h2>What kind of work do you do?</h2>
+        <p class="sub">Quill sets up a sample client that fits.</p>
+        <button class="opt on" data-r="freelancer"><b>Freelancer</b><small>Design, writing, development,
+            marketing</small></button>
+        <button class="opt" data-r="consultant"><b>Consultant</b><small>Advice and projects for business
+            clients</small></button>
+        <button class="opt" data-r="coach"><b>Coach or tutor</b><small>Sports, career, business or subject
+            coaching</small></button>
+      </div>
+      <div class="stp" id="s2" hidden>
+        <h2>How do you record your calls?</h2>
+        <p class="sub">Quill never joins a call. You record the way you already do, then drop the file in.</p>
+        <button class="opt on" data-s="1"><b>Zoom or Google Meet recordings</b><small>Download the audio file after the
+            call</small></button>
+        <button class="opt on" data-s="1"><b>Phone voice memo</b><small>Record on the phone and send the file to your
+            laptop</small></button>
+        <button class="opt" data-s="1"><b>In person, laptop mic</b><small>Record with any audio app</small></button>
+      </div>
+      <div class="stp" id="s3" hidden>
+        <h2>Meet your sample client</h2>
+        <p class="sub" id="s3t"></p>
+        <div class="card" style="padding:20px;margin-top:14px" id="s3c"></div>
+      </div>
+      <div class="nv"><button class="btn ln" id="bk">Back</button><button class="btn" id="nx">Continue</button></div>
+    </div>
+  </section>
+
+  <section data-page="app">
+    <div class="app">
+      <aside class="col side">
+        <div class="side-head">
+          <button id="sb-toggle" class="icon-btn" title="Toggle Sidebar">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <rect width="18" height="18" x="3" y="3" rx="2" />
+              <path d="M9 3v18" />
+            </svg>
+          </button>
+          <span class="lab side-title" style="margin:0">Clients</span>
+          <button id="add-cl-btn" class="icon-btn" title="Add Client" style="margin-left:auto">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12h14" />
+              <path d="M12 5v14" />
+            </svg>
+          </button>
+        </div>
+        <div id="cls"></div>
+      </aside>
+      <main class="col" id="mn">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+          <button id="sb-expand" class="icon-btn" title="Open Sidebar">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <rect width="18" height="18" x="3" y="3" rx="2" />
+              <path d="M9 3v18" />
+            </svg>
+          </button>
+          <h3 style="margin:0">Add a call with <span id="ct">Dana</span></h3>
+        </div>
+        <p class="mut" style="margin-top:2px">Drop in the recording from Zoom, Meet or your phone. It stays on this
+          laptop.</p>
+        <div id="flag-banner" class="flag-banner" role="status" aria-live="polite"></div>
+        <label class="drop" id="dz"><input type="file" id="fl" accept="audio/*,video/*" hidden><b id="dt">Choose a
+            recording</b><span id="ds">or use the sample call below</span></label>
+        <div id="player-box" class="player-box" hidden>
+          <div class="player-row">
+            <button id="ply-btn" class="ply-btn" title="Play / Pause audio">
+              <svg id="ply-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <polygon points="5 3 19 12 5 21 5 3" />
+              </svg>
+            </button>
+            <div class="player-track">
+              <div class="player-info">
+                <span id="ply-title"
+                  style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Call
+                  Recording</span>
+                <span id="ply-time" class="mut">0:00 / 0:00</span>
+              </div>
+              <input type="range" id="ply-seek" min="0" max="100" value="0" class="player-seek">
+            </div>
+            <div class="speed-selector">
+              <button class="spd-btn" data-spd="0.75">0.75x</button>
+              <button class="spd-btn on" data-spd="1">1x</button>
+              <button class="spd-btn" data-spd="1.25">1.25x</button>
+              <button class="spd-btn" data-spd="1.5">1.5x</button>
+              <button class="spd-btn" data-spd="2">2x</button>
+            </div>
+          </div>
+          <audio id="aud" preload="metadata"></audio>
+        </div>
+        <div class="acts"><button class="btn ac" id="go" disabled>Process this call</button><button class="btn ln"
+            id="sm">Use the sample call</button></div>
+        <div class="tg" id="tg" hidden><input type="checkbox" id="tk"><label for="tk">Show technical details</label>
+        </div>
+        <div id="steps"></div>
+      </main>
+      <aside class="col" id="rt">
+        <div id="tr" hidden style="margin-bottom:26px">
+          <div class="loc">Audio, transcript and notes stayed on this laptop</div>
+          <p class="lab">Left your laptop</p>
+          <div id="led"></div>
+        </div>
+        <p class="lab" id="rph">What Quill found</p>
+        <p class="mut" id="rpt">After you process a call, the promises, any question for you, and the drafts to approve
+          will appear here.</p>
+        <div class="res" id="res"></div>
+      </aside>
+    </div>
+  </section>
+  <section data-page="dashboard">
+    <div class="pg">
+      <h2>Dashboard</h2>
+      <p class="mut">Everything open across all your clients, in one place.</p>
+      <div class="s4" id="td-stats"></div>
+      <h3>Needs you</h3>
+      <div class="wide">
+        <table>
+          <tbody id="td-list"></tbody>
+        </table>
+      </div>
+      <h3>Coming up</h3>
+      <div id="td-rem"></div>
+      <h3>Clients at a glance</h3>
+      <div class="wide">
+        <table>
+          <thead>
+            <tr>
+              <th>Client</th>
+              <th>Last call</th>
+              <th>Open promises</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="td-cl"></tbody>
+        </table>
+      </div>
+      <p style="margin-top:26px"><a class="btn" href="#app">Add a call</a></p>
+    </div>
+  </section>
+  <div class="modal" id="cl-modal">
+    <div class="modal-card">
+      <h3>Add a new client</h3>
+      <p class="mut" style="margin:4px 0 16px;font-size:14px">Track calls, promises, and retention for this client.</p>
+      <div class="modal-field">
+        <label for="new-cl-name">Client Name</label>
+        <input type="text" id="new-cl-name" placeholder="e.g. Maya Lin" required>
+      </div>
+      <div class="modal-field">
+        <label for="new-cl-role">Work Type</label>
+        <select id="new-cl-role">
+          <option value="freelancer">Freelancer (Design, dev, writing)</option>
+          <option value="consultant">Consultant (Operations, advisory)</option>
+          <option value="coach">Coach or tutor (Lessons, guidance)</option>
+        </select>
+      </div>
+      <div class="modal-field">
+        <label for="new-cl-gig">Project or Retainer Details</label>
+        <input type="text" id="new-cl-gig" placeholder="e.g. Brand redesign, quarterly contract">
+      </div>
+      <div class="acts" style="margin-top:20px;justify-content:flex-end">
+        <button class="btn sm ln" id="cl-cancel-btn">Cancel</button>
+        <button class="btn sm ac" id="cl-save-btn">Add client</button>
+      </div>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+  <script>
+    const $ = s => document.querySelector(s), pages = [...document.querySelectorAll('[data-page]')];
+    const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    const ROLE = { freelancer: 'Freelancer', consultant: 'Consultant', coach: 'Coach or tutor' };
+    function route() { const h = (location.hash || '#home').slice(1); pages.forEach(x => x.classList.toggle('on', x.dataset.page === h)); document.querySelectorAll('nav a').forEach(a => a.classList.toggle('on', a.dataset.n === h)); scrollTo(0, 0); if (h === 'dashboard') loadDash() }
+    addEventListener('hashchange', route);
+    function toast(t) { const e = $('#toast'); e.textContent = t; e.classList.add('on'); setTimeout(() => e.classList.remove('on'), 1900) }
+    const J = async (u, o) => { let r; try { r = await fetch(u, o) } catch { throw new Error('Cannot reach the Quill server.') } const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error?.message || 'Something went wrong.'); return d };
+    const POST = (u, b) => J(u, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(b || {}) });
+    const LED0 = '<p class="mut">Nothing yet. Anything sent out will be listed here with its exact contents.</p>';
+    let clients = [], key = null, run = 0, ready = null, es = null, pend = null, pickRole = 'freelancer', step = 1;
+    const cl = () => clients.find(c => c.id === key);
+    const sampleAudioMap = {
+      dana: '/demo_recordings/dana_call_recording.wav',
+      marcus: '/demo_recordings/marcus_call_recording.wav',
+      ines: '/demo_recordings/ines_call_recording.wav'
+    };
+    const aud = $('#aud');
+    let audPlaying = false;
+    function fmtTime(sec) {
+      if (isNaN(sec) || sec < 0) return '0:00';
+      const m = Math.floor(sec / 60), s = Math.floor(sec % 60);
+      return `${m}:${s < 10 ? '0' : ''}${s}`;
+    }
+    function updatePlayBtn() {
+      $('#ply-icon').innerHTML = audPlaying
+        ? '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>'
+        : '<polygon points="5 3 19 12 5 21 5 3"/>';
+    }
+    $('#ply-btn').onclick = () => {
+      if (!aud.src) return;
+      if (aud.paused) aud.play(); else aud.pause();
+    };
+    aud.onplay = () => { audPlaying = true; updatePlayBtn() };
+    aud.onpause = () => { audPlaying = false; updatePlayBtn() };
+    aud.onended = () => { audPlaying = false; updatePlayBtn(); $('#ply-seek').value = 0 };
+    aud.ontimeupdate = () => {
+      if (aud.duration) {
+        $('#ply-seek').value = (aud.currentTime / aud.duration) * 100;
+        $('#ply-time').textContent = `${fmtTime(aud.currentTime)} / ${fmtTime(aud.duration)}`;
+      }
+    };
+    $('#ply-seek').oninput = e => {
+      if (aud.duration) aud.currentTime = (e.target.value / 100) * aud.duration;
+    };
+    document.querySelectorAll('.spd-btn').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('.spd-btn').forEach(b => b.classList.remove('on'));
+        btn.classList.add('on');
+        aud.playbackRate = parseFloat(btn.dataset.spd);
+      };
+    });
+    $('#sb-toggle').onclick = () => $('.app').classList.add('collapsed');
+    $('#sb-expand').onclick = () => $('.app').classList.remove('collapsed');
+    $('#add-cl-btn').onclick = () => {
+      $('#cl-modal').classList.add('on');
+      $('#new-cl-name').value = '';
+      $('#new-cl-gig').value = '';
+      $('#new-cl-name').focus();
+    };
+
+    const CORE_CLIENTS = ['dana', 'marcus', 'ines'];
+    function renderClients() {
+      $('#cls').innerHTML = clients.map(c => `
     <div class="cl-row">
-      <button class="cl ${c.id===key?'on':''}" data-k="${esc(c.id)}">
+      <button class="cl ${c.id === key ? 'on' : ''}" data-k="${esc(c.id)}">
         <b>${esc(c.name)}</b>
-        <small>${ROLE[c.role]||c.role}: ${esc(c.gig)}</small>
+        <small>${ROLE[c.role] || c.role}: ${esc(c.gig)}</small>
       </button>
-      ${!CORE_CLIENTS.includes(c.id)?`
+      ${!CORE_CLIENTS.includes(c.id) ? `
         <button class="del-cl-btn" data-del="${esc(c.id)}" data-name="${esc(c.name)}" title="Delete client">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/>
           </svg>
         </button>
-      `:''}
+      `: ''}
     </div>
   `).join('');
-  document.querySelectorAll('.cl').forEach(b=>b.onclick=()=>pick(b.dataset.k));
-  document.querySelectorAll('.del-cl-btn').forEach(btn=>{
-    btn.onclick=async(e)=>{
-      e.stopPropagation();
-      const id=btn.dataset.del,name=btn.dataset.name;
-      if(!confirm(`Delete client "${name}"?`))return;
-      try{
-        await J('/api/clients/'+id,{method:'DELETE'});
-        clients=clients.filter(c=>c.id!==id);
-        if(key===id)pick(clients[0]?.id||'dana');
-        renderClients();
-        toast(`Deleted ${name}`);
-      }catch(err){
-        toast(err.message);
-      }
+      document.querySelectorAll('.cl').forEach(b => b.onclick = () => pick(b.dataset.k));
+      document.querySelectorAll('.del-cl-btn').forEach(btn => {
+        btn.onclick = async (e) => {
+          e.stopPropagation();
+          const id = btn.dataset.del, name = btn.dataset.name;
+          if (!confirm(`Delete client "${name}"?`)) return;
+          try {
+            await J('/api/clients/' + id, { method: 'DELETE' });
+            clients = clients.filter(c => c.id !== id);
+            if (key === id) pick(clients[0]?.id || 'dana');
+            renderClients();
+            toast(`Deleted ${name}`);
+          } catch (err) {
+            toast(err.message);
+          }
+        };
+      });
+    }
+
+    async function init() {
+      try { await J('/api/health') } catch { }
+      try { clients = await J('/api/clients') } catch (e) { $('#cls').innerHTML = `<p class="mut">${esc(e.message)} Start it with <b>npm run dev</b>.</p>`; route(); return }
+      renderClients();
+      if (clients[0]) pick(clients[0].id); route();
+    }
+    const CLIENT_FLAGS = {
+      dana: { cls: 'am', text: 'Retention flag: Dana missed 2 of her last 4 calls (16-day gap). Tone set to low-pressure check-in.' },
+      marcus: { cls: 'ok', text: 'Client is on track: Marcus has attended every session for 6 weeks. No action needed.' },
+      ines: { cls: 'am', text: 'Watch flag: Ines reply times have been slowing (8-day gap). Gentle follow-up recommended.' }
     };
-  });
-}
+    function setFlagBanner(cls, text) {
+      const b = $('#flag-banner');
+      b.className = 'flag-banner' + (cls ? ' ' + cls : '');
+      b.textContent = text || '';
+    }
+    function pick(k) {
+      key = k; run++; ready = null; if (es) { es.close(); es = null }
+      if (aud) { aud.pause(); aud.src = ''; audPlaying = false; updatePlayBtn() }
+      $('#player-box').hidden = true;
+      document.querySelectorAll('.cl').forEach(b => b.classList.toggle('on', b.dataset.k === k));
+      $('#ct').textContent = cl()?.name || ''; $('#dt').textContent = 'Choose a recording'; $('#ds').textContent = 'or use the sample call below';
+      $('#dz').classList.remove('has'); $('#go').disabled = true; $('#steps').innerHTML = ''; $('#tg').hidden = true; $('#tr').hidden = true;
+      $('#res').classList.remove('on'); $('#res').innerHTML = ''; $('#rph').hidden = false; $('#rpt').hidden = false; $('#led').innerHTML = LED0;
+      const f = CLIENT_FLAGS[k];
+      if (f) setFlagBanner(f.cls, f.text); else setFlagBanner('', '');
+    }
+    function arm(label, r) {
+      ready = r; $('#go').disabled = false; $('#dz').classList.add('has'); $('#dt').textContent = label; $('#ds').textContent = 'Ready to process on this laptop';
+      if (r.file) {
+        aud.src = URL.createObjectURL(r.file);
+        $('#ply-title').textContent = r.file.name;
+        $('#player-box').hidden = false;
+      } else if (r.sample) {
+        const s = sampleAudioMap[key] || '';
+        aud.src = s;
+        $('#ply-title').textContent = (cl()?.name || 'Sample') + ' call recording';
+        $('#player-box').hidden = !s;
+      }
+      const curSpd = parseFloat(document.querySelector('.spd-btn.on')?.dataset.spd || '1');
+      aud.playbackRate = curSpd;
+    }
+    $('#fl').onchange = e => { const f = e.target.files[0]; if (f) arm(f.name, { file: f }) };
+    $('#sm').onclick = () => arm('Sample call for ' + (cl()?.name || ''), { sample: true });
+    $('#tk').onchange = e => $('#mn').classList.toggle('tech', e.target.checked);
 
-async function init(){
-  try{const h=await J('/api/health');if(h.mode==='replay')$('#banner').hidden=false}catch{}
-  try{clients=await J('/api/clients')}catch(e){$('#cls').innerHTML=`<p class="mut">${esc(e.message)} Start it with <b>npm run dev</b>.</p>`;route();return}
-  renderClients();
-  if(clients[0])pick(clients[0].id);route();
-}
-const CLIENT_FLAGS={
-  dana:{cls:'am',text:'Retention flag: Dana missed 2 of her last 4 calls (16-day gap). Tone set to low-pressure check-in.'},
-  marcus:{cls:'ok',text:'Client is on track: Marcus has attended every session for 6 weeks. No action needed.'},
-  ines:{cls:'am',text:'Watch flag: Ines reply times have been slowing (8-day gap). Gentle follow-up recommended.'}
-};
-function setFlagBanner(cls,text){
-  const b=$('#flag-banner');
-  b.className='flag-banner'+(cls?' '+cls:'');
-  b.textContent=text||'';
-}
-function pick(k){
-  key=k;run++;ready=null;if(es){es.close();es=null}
-  if(aud){aud.pause();aud.src='';audPlaying=false;updatePlayBtn()}
-  $('#player-box').hidden=true;
-  document.querySelectorAll('.cl').forEach(b=>b.classList.toggle('on',b.dataset.k===k));
-  $('#ct').textContent=cl()?.name||'';$('#dt').textContent='Choose a recording';$('#ds').textContent='or use the sample call below';
-  $('#dz').classList.remove('has');$('#go').disabled=true;$('#steps').innerHTML='';$('#tg').hidden=true;$('#tr').hidden=true;
-  $('#res').classList.remove('on');$('#res').innerHTML='';$('#rph').hidden=false;$('#rpt').hidden=false;$('#led').innerHTML=LED0;
-  const f=CLIENT_FLAGS[k];
-  if(f)setFlagBanner(f.cls,f.text);else setFlagBanner('','');
-}
-function arm(label,r){
-  ready=r;$('#go').disabled=false;$('#dz').classList.add('has');$('#dt').textContent=label;$('#ds').textContent='Ready to process on this laptop';
-  if(r.file){
-    aud.src=URL.createObjectURL(r.file);
-    $('#ply-title').textContent=r.file.name;
-    $('#player-box').hidden=false;
-  }else if(r.sample){
-    const s=sampleAudioMap[key]||'';
-    aud.src=s;
-    $('#ply-title').textContent=(cl()?.name||'Sample')+' call recording';
-    $('#player-box').hidden=!s;
-  }
-  const curSpd=parseFloat(document.querySelector('.spd-btn.on')?.dataset.spd||'1');
-  aud.playbackRate=curSpd;
-}
-$('#fl').onchange=e=>{const f=e.target.files[0];if(f)arm(f.name,{file:f})};
-$('#sm').onclick=()=>arm('Sample call for '+(cl()?.name||''),{sample:true});
-$('#tk').onchange=e=>$('#mn').classList.toggle('tech',e.target.checked);
+    function fail(msg) {
+      if (es) { es.close(); es = null }
+      if (pend) { pend.remove(); pend = null }
+      const el = document.createElement('div'); el.className = 'st on';
+      el.innerHTML = `<span class="dot am"></span><div><b>Processing stopped</b><p>${esc(msg)}</p></div><span></span>`; $('#steps').appendChild(el);
+      $('#go').disabled = false;
+    }
+    function addStep(s) {
+      const prev = document.querySelector('.dot.sp');
+      if (pend) { pend.remove() }
+      const el = document.createElement('div'); el.className = 'st';
+      const t = s.ms < 100 ? '<0.1 s' : (s.ms / 1000).toFixed(1) + ' s';
+      el.innerHTML = `<span class="dot ${s.egress ? 'am' : 'ok'}"></span><div><b>${esc(s.title)}</b><p>${esc(s.result)}</p><div class="t">${esc(s.tech)}</div></div><span class="ms">${t}</span>`;
+      $('#steps').appendChild(el); requestAnimationFrame(() => el.classList.add('on'));
+      if (s.egress) { if (!$('#led .led')) $('#led').innerHTML = ''; const l = document.createElement('div'); l.className = 'led'; l.innerHTML = `<b>Sent to: ${esc(s.egress.to)}</b><p>${esc(s.egress.contents)}</p>`; $('#led').appendChild(l) }
+      pend = document.createElement('div'); pend.className = 'st on'; pend.innerHTML = '<span class="dot sp"></span><div><b>Working...</b></div><span></span>'; $('#steps').appendChild(pend);
+    }
+    $('#go').onclick = async () => {
+      if (!ready || !key) return; const id = ++run;
+      $('#go').disabled = true; $('#res').classList.remove('on'); $('#rph').hidden = false; $('#rpt').hidden = false;
+      $('#tg').hidden = false; $('#tr').hidden = false; $('#steps').innerHTML = ''; $('#led').innerHTML = LED0; pend = null;
+      try {
+        let r;
+        if (ready.file) { const fd = new FormData(); fd.append('clientId', key); fd.append('audio', ready.file); r = await J('/api/calls', { method: 'POST', body: fd }) }
+        else r = await POST('/api/calls/sample', { clientKey: key });
+        if (id !== run) return; stream(r.callId, id);
+      } catch (e) { fail(e.message) }
+    };
+    function stream(callId, id) {
+      es = new EventSource(`/api/calls/${callId}/stream`);
+      es.addEventListener('step', ev => { if (id === run) addStep(JSON.parse(ev.data)) });
+      es.addEventListener('done', async () => {
+        es.close(); es = null; if (id !== run) return; if (pend) { pend.remove(); pend = null }
+        try { render(await J(`/api/calls/${callId}/results`)) } catch (e) { fail(e.message) } $('#go').disabled = false;
+      });
+      es.addEventListener('error', ev => { if (ev.data && id === run) { fail(JSON.parse(ev.data).message) } });
+    }
 
-function fail(msg){
-  if(es){es.close();es=null}
-  if(pend){pend.remove();pend=null}
-  const el=document.createElement('div');el.className='st on';
-  el.innerHTML=`<span class="dot am"></span><div><b>Processing stopped</b><p>${esc(msg)}</p></div><span></span>`;$('#steps').appendChild(el);
-  $('#go').disabled=false;
-}
-function addStep(s){
-  const prev=document.querySelector('.dot.sp');
-  if(pend){pend.remove()}
-  const el=document.createElement('div');el.className='st';
-  const t=s.ms<100?'<0.1 s':(s.ms/1000).toFixed(1)+' s';
-  el.innerHTML=`<span class="dot ${s.egress?'am':'ok'}"></span><div><b>${esc(s.title)}</b><p>${esc(s.result)}</p><div class="t">${esc(s.tech)}</div></div><span class="ms">${t}</span>`;
-  $('#steps').appendChild(el);requestAnimationFrame(()=>el.classList.add('on'));
-  if(s.egress){if(!$('#led .led'))$('#led').innerHTML='';const l=document.createElement('div');l.className='led';l.innerHTML=`<b>Sent to: ${esc(s.egress.to)}</b><p>${esc(s.egress.contents)}</p>`;$('#led').appendChild(l)}
-  pend=document.createElement('div');pend.className='st on';pend.innerHTML='<span class="dot sp"></span><div><b>Working...</b></div><span></span>';$('#steps').appendChild(pend);
-}
-$('#go').onclick=async()=>{
-  if(!ready||!key)return;const id=++run;
-  $('#go').disabled=true;$('#res').classList.remove('on');$('#rph').hidden=false;$('#rpt').hidden=false;
-  $('#tg').hidden=false;$('#tr').hidden=false;$('#steps').innerHTML='';$('#led').innerHTML=LED0;pend=null;
-  try{
-    let r;
-    if(ready.file){const fd=new FormData();fd.append('clientId',key);fd.append('audio',ready.file);r=await J('/api/calls',{method:'POST',body:fd})}
-    else r=await POST('/api/calls/sample',{clientKey:key});
-    if(id!==run)return;stream(r.callId,id);
-  }catch(e){fail(e.message)}
-};
-function stream(callId,id){
-  es=new EventSource(`/api/calls/${callId}/stream`);
-  es.addEventListener('step',ev=>{if(id===run)addStep(JSON.parse(ev.data))});
-  es.addEventListener('done',async()=>{
-    es.close();es=null;if(id!==run)return;if(pend){pend.remove();pend=null}
-    try{render(await J(`/api/calls/${callId}/results`))}catch(e){fail(e.message)}$('#go').disabled=false;
-  });
-  es.addEventListener('error',ev=>{if(ev.data&&id===run){fail(JSON.parse(ev.data).message)}});
-}
-
-function render(r){
-  const who=c=>c.who==='you'?'You':esc(r.clientName||'Client');
-  const rows=r.commitments.map(c=>`<tr><td><b>${who(c)}</b></td><td>${esc(c.text)}<div class="mut" style="margin-top:2px">\u201c${esc(c.quote)}\u201d <button class="lnk" data-sw="${esc(c.id)}" data-w="${c.who}">wrong person?</button></div></td><td>${esc(c.due||'No date')}</td><td>${c.status==='unclear'?'<span class="pill a">Your call</span>':'<span class="pill b">Tracked</span>'}</td></tr>`).join('');
-  const em=r.drafts.find(d=>d.kind==='email'),rm=r.drafts.find(d=>d.kind==='reminder');
-  const when=rm?.remindAt?new Date(rm.remindAt).toLocaleString([],{weekday:'long',hour:'numeric',minute:'2-digit'}):'';
-  const q=r.question;
-  if(!CLIENT_FLAGS[key]&&r.summary?.flag){
-    const lvl=r.summary.flagLevel==='ok'?'ok':'am';
-    setFlagBanner(lvl,r.summary.flag);
-  }
-  $('#res').innerHTML=`<div class="sum"><div><b>${r.summary.promisesFound}</b><span>promises found</span></div><div><b>${r.summary.needsAnswer}</b><span>need your answer</span></div><div class="${r.summary.flagLevel==='ok'?'g':'w'}"><b>${esc(r.clientName||'')}</b><span>${esc(r.summary.flag)}</span></div></div>
-<h3>Promises from this call</h3><div class="wide"><table><tbody>${rows||'<tr><td class="mut">No promises found.</td></tr>'}</tbody></table></div>
-${q?`<div class="q" id="q0"><b>${esc(q.title)}</b><p class="mut" style="margin:4px 0 10px">${esc(q.text)}</p><div class="acts"><button class="btn sm ac" data-ans="1">${esc(q.yesLabel)}</button><button class="btn sm ln" data-ans="0">No</button></div></div>`:''}
+    function render(r) {
+      const who = c => c.who === 'you' ? 'You' : esc(r.clientName || 'Client');
+      const rows = r.commitments.map(c => `<tr><td><b>${who(c)}</b></td><td>${esc(c.text)}<div class="mut" style="margin-top:2px">\u201c${esc(c.quote)}\u201d <button class="lnk" data-sw="${esc(c.id)}" data-w="${c.who}">wrong person?</button></div></td><td>${esc(c.due || 'No date')}</td><td>${c.status === 'unclear' ? '<span class="pill a">Your call</span>' : '<span class="pill b">Tracked</span>'}</td></tr>`).join('');
+      const em = r.drafts.find(d => d.kind === 'email'), rm = r.drafts.find(d => d.kind === 'reminder');
+      const when = rm?.remindAt ? new Date(rm.remindAt).toLocaleString([], { weekday: 'long', hour: 'numeric', minute: '2-digit' }) : '';
+      const q = r.question;
+      if (!CLIENT_FLAGS[key] && r.summary?.flag) {
+        const lvl = r.summary.flagLevel === 'ok' ? 'ok' : 'am';
+        setFlagBanner(lvl, r.summary.flag);
+      }
+      $('#res').innerHTML = `<div class="sum"><div><b>${r.summary.promisesFound}</b><span>promises found</span></div><div><b>${r.summary.needsAnswer}</b><span>need your answer</span></div><div class="${r.summary.flagLevel === 'ok' ? 'g' : 'w'}"><b>${esc(r.clientName || '')}</b><span>${esc(r.summary.flag)}</span></div></div>
+<h3>Promises from this call</h3><div class="wide"><table><tbody>${rows || '<tr><td class="mut">No promises found.</td></tr>'}</tbody></table></div>
+${q ? `<div class="q" id="q0"><b>${esc(q.title)}</b><p class="mut" style="margin:4px 0 10px">${esc(q.text)}</p><div class="acts"><button class="btn sm ac" data-ans="1">${esc(q.yesLabel)}</button><button class="btn sm ln" data-ans="0">No</button></div></div>` : ''}
 <h3>Ready for your approval</h3><p class="mut">Why: ${esc(r.why)}</p>
-${em?`<div class="q" id="q1"><b>Email to ${esc(r.clientName||'client')}</b><div class="mut">${esc(em.subject||'')}</div><textarea id="em">${esc(em.body)}</textarea><div class="acts"><button class="btn sm ac" id="ap1">Approve</button><button class="btn sm ln" id="dm1">Dismiss</button></div></div>`:''}
-${rm?`<div class="q" id="q2"><b>Reminder for you${when?': '+esc(when):''}</b><p class="mut" style="margin:4px 0 10px">${esc(rm.body)}</p><div class="acts"><button class="btn sm ac" id="ap2">Schedule it</button><button class="btn sm ln" id="dm2">Dismiss</button></div></div>`:''}`;
-  $('#rph').hidden=true;$('#rpt').hidden=true;$('#res').classList.add('on');
-  document.querySelectorAll('[data-sw]').forEach(b=>b.onclick=async()=>{try{const nw=b.dataset.w==='you'?'client':'you';await J('/api/commitments/'+b.dataset.sw,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({who:nw})});b.dataset.w=nw;const td=b.closest('tr')?.querySelector('td b');if(td)td.textContent=nw==='you'?'You':(r.clientName||'Client');toast('Switched to '+(nw==='you'?'You':(r.clientName||'Client')))}catch(e){toast(e.message)}});
-  if(q)document.querySelectorAll('[data-ans]').forEach(b=>b.onclick=async()=>{try{await POST(`/api/commitments/${q.commitmentId}/answer`,{track:b.dataset.ans==='1'});const e=$('#q0');e.className='q done';e.textContent=b.dataset.ans==='1'?'Tracked as a commitment.':'Not tracked.'}catch(e){toast(e.message)}});
-  const doneCard=(id,msg,extra)=>{const e=$(id);e.className='q done';e.innerHTML=`<div>${esc(msg)}</div>${extra||''}`};
-  if(em){$('#ap1').onclick=async()=>{try{const body=$('#em').value;const o=await POST(`/api/actions/${em.id}/approve`,{body});doneCard('#q1','Approved. Nothing was sent: copy it or open it in your mail app.',`<div class="acts" style="margin-top:8px"><button class="btn sm ln" id="cpy">Copy email</button><a class="btn sm ln" href="${esc(o.mailto||'#')}">Open in mail app</a></div>`);$('#cpy').onclick=()=>{navigator.clipboard?.writeText(body);toast('Copied')}}catch(e){toast(e.message)}};$('#dm1').onclick=async()=>{await POST(`/api/actions/${em.id}/dismiss`);doneCard('#q1','Dismissed.')}}
-  if(rm){$('#ap2').onclick=async()=>{try{await POST(`/api/actions/${rm.id}/approve`,{body:rm.body});doneCard('#q2','Scheduled. It appears on your Dashboard.')}catch(e){toast(e.message)}};$('#dm2').onclick=async()=>{await POST(`/api/actions/${rm.id}/dismiss`);doneCard('#q2','Dismissed.')}}
-}
+${em ? `<div class="q" id="q1"><b>Email to ${esc(r.clientName || 'client')}</b><div class="mut">${esc(em.subject || '')}</div><textarea id="em">${esc(em.body)}</textarea><div class="acts"><button class="btn sm ac" id="ap1">Approve</button><button class="btn sm ln" id="dm1">Dismiss</button></div></div>` : ''}
+${rm ? `<div class="q" id="q2"><b>Reminder for you${when ? ': ' + esc(when) : ''}</b><p class="mut" style="margin:4px 0 10px">${esc(rm.body)}</p><div class="acts"><button class="btn sm ac" id="ap2">Schedule it</button><button class="btn sm ln" id="dm2">Dismiss</button></div></div>` : ''}`;
+      $('#rph').hidden = true; $('#rpt').hidden = true; $('#res').classList.add('on');
+      document.querySelectorAll('[data-sw]').forEach(b => b.onclick = async () => { try { const nw = b.dataset.w === 'you' ? 'client' : 'you'; await J('/api/commitments/' + b.dataset.sw, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ who: nw }) }); b.dataset.w = nw; const td = b.closest('tr')?.querySelector('td b'); if (td) td.textContent = nw === 'you' ? 'You' : (r.clientName || 'Client'); toast('Switched to ' + (nw === 'you' ? 'You' : (r.clientName || 'Client'))) } catch (e) { toast(e.message) } });
+      if (q) document.querySelectorAll('[data-ans]').forEach(b => b.onclick = async () => { try { await POST(`/api/commitments/${q.commitmentId}/answer`, { track: b.dataset.ans === '1' }); const e = $('#q0'); e.className = 'q done'; e.textContent = b.dataset.ans === '1' ? 'Tracked as a commitment.' : 'Not tracked.' } catch (e) { toast(e.message) } });
+      const doneCard = (id, msg, extra) => { const e = $(id); e.className = 'q done'; e.innerHTML = `<div>${esc(msg)}</div>${extra || ''}` };
+      if (em) { $('#ap1').onclick = async () => { try { const body = $('#em').value; const o = await POST(`/api/actions/${em.id}/approve`, { body }); doneCard('#q1', 'Approved. Nothing was sent: copy it or open it in your mail app.', `<div class="acts" style="margin-top:8px"><button class="btn sm ln" id="cpy">Copy email</button><a class="btn sm ln" href="${esc(o.mailto || '#')}">Open in mail app</a></div>`); $('#cpy').onclick = () => { navigator.clipboard?.writeText(body); toast('Copied') } } catch (e) { toast(e.message) } }; $('#dm1').onclick = async () => { await POST(`/api/actions/${em.id}/dismiss`); doneCard('#q1', 'Dismissed.') } }
+      if (rm) { $('#ap2').onclick = async () => { try { await POST(`/api/actions/${rm.id}/approve`, { body: rm.body }); doneCard('#q2', 'Scheduled. It appears on your Dashboard.') } catch (e) { toast(e.message) } }; $('#dm2').onclick = async () => { await POST(`/api/actions/${rm.id}/dismiss`); doneCard('#q2', 'Dismissed.') } }
+    }
 
-async function loadDash(){
-  let d;try{d=await J('/api/dashboard')}catch(e){$('#td-stats').innerHTML=`<p class="mut">${esc(e.message)}</p>`;return}
-  const c=d.counts;
-  $('#td-stats').innerHTML=`<div><b>${c.open}</b><span>open promises</span></div><div class="${c.overdue?'w':'g'}"><b>${c.overdue}</b><span>overdue</span></div><div><b>${c.reminders}</b><span>reminders coming up</span></div><div><b>${c.invoices}</b><span>invoices to send</span></div>`;
-  const pill=s=>s==='overdue'?'<span class="pill a">Overdue</span>':'<span class="pill b">Open</span>';
-  $('#td-list').innerHTML=d.needs.map(p=>`<tr><td><b>${esc(p.clientName)}</b></td><td>${p.who==='you'?'You promised':esc(p.clientName)+' promised'}: ${esc(p.text)}</td><td>${esc(p.due||'')}</td><td>${pill(p.status)}</td></tr>`).join('')||'<tr><td class="mut">Nothing open.</td></tr>';
-  $('#td-rem').innerHTML=d.reminders.map(r=>`<div class="rem"><div><b>${esc(r.text)}</b><div class="mut">${esc(r.clientName||'')}, ${new Date(r.remindAt).toLocaleString([],{weekday:'short',hour:'numeric',minute:'2-digit'})}${r.state==='due'?' (due now)':''}</div></div></div>`).join('')||'<p class="mut">No reminders yet. Approve one after a call.</p>';
-  const ago=t=>t?Math.max(0,Math.round((Date.now()-new Date(t))/864e5))+' days ago':'No calls yet';
-  $('#td-cl').innerHTML=d.clients.map(c=>`<tr><td><b>${esc(c.name)}</b><div class="mut">${ROLE[c.role]||''}</div></td><td>${ago(c.lastCallAt)}</td><td>${c.openPromises}</td><td><span class="pill ${c.status==='ok'?'g':'a'}">${esc(c.statusLabel)}</span></td></tr>`).join('');
-}
+    async function loadDash() {
+      let d; try { d = await J('/api/dashboard') } catch (e) { $('#td-stats').innerHTML = `<p class="mut">${esc(e.message)}</p>`; return }
+      const c = d.counts;
+      $('#td-stats').innerHTML = `<div><b>${c.open}</b><span>open promises</span></div><div class="${c.overdue ? 'w' : 'g'}"><b>${c.overdue}</b><span>overdue</span></div><div><b>${c.reminders}</b><span>reminders coming up</span></div><div><b>${c.invoices}</b><span>invoices to send</span></div>`;
+      const pill = s => s === 'overdue' ? '<span class="pill a">Overdue</span>' : '<span class="pill b">Open</span>';
+      $('#td-list').innerHTML = d.needs.map(p => `<tr><td><b>${esc(p.clientName)}</b></td><td>${p.who === 'you' ? 'You promised' : esc(p.clientName) + ' promised'}: ${esc(p.text)}</td><td>${esc(p.due || '')}</td><td>${pill(p.status)}</td></tr>`).join('') || '<tr><td class="mut">Nothing open.</td></tr>';
+      $('#td-rem').innerHTML = d.reminders.map(r => `<div class="rem"><div><b>${esc(r.text)}</b><div class="mut">${esc(r.clientName || '')}, ${new Date(r.remindAt).toLocaleString([], { weekday: 'short', hour: 'numeric', minute: '2-digit' })}${r.state === 'due' ? ' (due now)' : ''}</div></div></div>`).join('') || '<p class="mut">No reminders yet. Approve one after a call.</p>';
+      const ago = t => t ? Math.max(0, Math.round((Date.now() - new Date(t)) / 864e5)) + ' days ago' : 'No calls yet';
+      $('#td-cl').innerHTML = d.clients.map(c => `<tr><td><b>${esc(c.name)}</b><div class="mut">${ROLE[c.role] || ''}</div></td><td>${ago(c.lastCallAt)}</td><td>${c.openPromises}</td><td><span class="pill ${c.status === 'ok' ? 'g' : 'a'}">${esc(c.statusLabel)}</span></td></tr>`).join('');
+    }
 
-// Onboarding
-function show(){for(let i=1;i<=3;i++)$('#s'+i).hidden=i!==step;$('#sp').textContent='Step '+step+' of 3';$('#sb').style.width=step*33.3+'%';$('#bk').style.visibility=step===1?'hidden':'visible';$('#nx').textContent=step===3?'Open my workspace':'Continue';
-  if(step===3){const c=clients.find(x=>x.role===pickRole)||clients[0];if(c){$('#s3t').textContent=`${c.name} is a sample ${(ROLE[c.role]||'').toLowerCase()} client. You can switch clients any time.`;$('#s3c').innerHTML=`<b>${esc(c.name)}</b><div class="mut">${esc(c.gig)}</div><p style="margin:12px 0 0">Quill will track what you and ${esc(c.name)} promise on each call, and notice if ${esc(c.name)} starts to drift.</p>`}}}
-document.querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-r]').forEach(x=>x.classList.remove('on'));b.classList.add('on');pickRole=b.dataset.r});
-document.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>b.classList.toggle('on'));
-$('#bk').onclick=()=>{step--;show()};
-$('#nx').onclick=()=>{if(step<3){step++;show();return}const c=clients.find(x=>x.role===pickRole)||clients[0];if(c)pick(c.id);location.hash='#app'};
-$('#cl-cancel-btn').onclick=()=>$('#cl-modal').classList.remove('on');
-$('#cl-save-btn').onclick=async()=>{
-  const name=$('#new-cl-name').value.trim();
-  const role=$('#new-cl-role').value;
-  const gig=$('#new-cl-gig').value.trim();
-  if(!name){toast('Please enter a client name.');return}
-  try{
-    const created=await POST('/api/clients',{name,role,gig});
-    clients.push(created);
-    renderClients();
-    pick(created.id);
-    $('#cl-modal').classList.remove('on');
-    toast(`Added ${name}`);
-  }catch(e){toast(e.message)}
-};
-show();init();
-</script>
-</body></html>
+    // Onboarding
+    function show() {
+      for (let i = 1; i <= 3; i++)$('#s' + i).hidden = i !== step; $('#sp').textContent = 'Step ' + step + ' of 3'; $('#sb').style.width = step * 33.3 + '%'; $('#bk').style.visibility = step === 1 ? 'hidden' : 'visible'; $('#nx').textContent = step === 3 ? 'Open my workspace' : 'Continue';
+      if (step === 3) { const c = clients.find(x => x.role === pickRole) || clients[0]; if (c) { $('#s3t').textContent = `${c.name} is a sample ${(ROLE[c.role] || '').toLowerCase()} client. You can switch clients any time.`; $('#s3c').innerHTML = `<b>${esc(c.name)}</b><div class="mut">${esc(c.gig)}</div><p style="margin:12px 0 0">Quill will track what you and ${esc(c.name)} promise on each call, and notice if ${esc(c.name)} starts to drift.</p>` } }
+    }
+    document.querySelectorAll('[data-r]').forEach(b => b.onclick = () => { document.querySelectorAll('[data-r]').forEach(x => x.classList.remove('on')); b.classList.add('on'); pickRole = b.dataset.r });
+    document.querySelectorAll('[data-s]').forEach(b => b.onclick = () => b.classList.toggle('on'));
+    $('#bk').onclick = () => { step--; show() };
+    $('#nx').onclick = () => { if (step < 3) { step++; show(); return } const c = clients.find(x => x.role === pickRole) || clients[0]; if (c) pick(c.id); location.hash = '#app' };
+    $('#cl-cancel-btn').onclick = () => $('#cl-modal').classList.remove('on');
+    $('#cl-save-btn').onclick = async () => {
+      const name = $('#new-cl-name').value.trim();
+      const role = $('#new-cl-role').value;
+      const gig = $('#new-cl-gig').value.trim();
+      if (!name) { toast('Please enter a client name.'); return }
+      try {
+        const created = await POST('/api/clients', { name, role, gig });
+        clients.push(created);
+        renderClients();
+        pick(created.id);
+        $('#cl-modal').classList.remove('on');
+        toast(`Added ${name}`);
+      } catch (e) { toast(e.message) }
+    };
+    show(); init();
+  </script>
+</body>
+
+</html>
